@@ -4,6 +4,8 @@ import "./index.scss";
 import { Form, Input, Button, Row, Col } from "antd";
 import { UserOutlined, UnlockOutlined } from "@ant-design/icons";
 import {validate_password}from "../../utils/validate"
+//接口
+import {Login} from "../../api/account";
 class loginForm extends Component {
   constructor() {
     super();
@@ -11,7 +13,11 @@ class loginForm extends Component {
     this.toggleClick = this.toggleClick.bind(this);
   }
   onFinish(values) {
-    console.log("Received values of form: ", values);
+    Login().then(res=>{
+      console.log(res);
+    }).catch(e=>{
+      console.log(e);
+    })
   }
   toggleClick(value){
     this.props.switchForm('register');
