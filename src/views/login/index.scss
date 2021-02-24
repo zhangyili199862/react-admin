@@ -1,0 +1,26 @@
+.form-wrap{
+    display: flex;
+    width: 300px;
+    height:100vh;
+    margin:auto;
+    // background-color: #fff;
+    align-items: center;
+    > div{
+        width: 100%;
+    }
+}
+.form-header{
+    height: 56px;
+    line-height: 56px;
+    color: #fff;
+    .column{
+        color:#fff;
+        float: left;
+        font-size: 16px;
+        margin-bottom: 0;
+    }
+    span{
+        float:right;
+        opacity: .3;
+    }
+}
