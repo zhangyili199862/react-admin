@@ -1,91 +1,55 @@
 import React, { Component, Fragment } from "react";
 import "./index.scss";
 //组件
-import { Form, Input, Button, Row, Col ,message } from "antd";
+import { Form, Input, Button, Row, Col } from "antd";
 import { UserOutlined, UnlockOutlined } from "@ant-design/icons";
-import {validate_password}from "../../utils/validate"
+import { validate_password } from "../../utils/validate";
+import {setToken} from "../../utils/session";
+import CodeButton from "../../components/code/index"
 //接口
-import {Login,GetCode} from "../../api/account";
+import { Login } from "../../api/account";
+import { withRouter } from "react-router-dom";
 class loginForm extends Component {
   constructor() {
     super();
     this.state = {
-      userName:"",
-      code_button_disabled:false,
-      code_button_loading:false,
-      code_button_text:"获取验证码"
+      userName: "",
+      loginLoading:false
     };
     this.toggleClick = this.toggleClick.bind(this);
-    this.countDown = this.countDown.bind(this);
+    this.onFinish = this.onFinish.bind(this);
   }
   //登录
   onFinish(values) {
-    Login().then(res=>{
-      console.log(res);
-    }).catch(e=>{
-      console.log(e);
+    this.setState({
+      loginLoading:true
     })
-  }
-  //获取验证码
-  getCode(){
-    const {userName} = this.state;
-    if(!userName){
-      message.warning("用户名不能为空！")
-      return
-    }else{
-      this.setState({
-        code_button_loading:true,
-        code_button_text:"发送中"
+    Login()
+      .then((res) => {
+        setToken('123');
+        console.log(res);
+        this.props.history.push('/index');
       })
-    }
-    const requestData = {
-      username:userName,
-      module:"login"
-    }
-    GetCode(requestData).then(res=>{
-      this.countDown();
-    }).catch(err=>{
-      this.setState({
-        code_button_loading:false,
-        code_button_text:"重新获取"
-      })
-    })
+      .catch((e) => {
+        this.setState({
+          loginLoading:false
+        })
+        console.log(e);
+      });
   }
   //Input输入
-  inputChange(e){
+  inputChange(e) {
     let value = e.target.value;
     this.setState({
-      userName:value
+      userName: value,
     });
   }
-  //倒计时
-  countDown(){
-    let sec = 60,timer = null;
-    this.setState({
-      code_button_loading:false,
-      code_button_disabled:true,
-      code_button_text:`${sec}S`
-    });
-    timer = setInterval(() => {
-      sec--;
-      if(sec<=0){
-        this.setState({
-          code_button_text:"重新获取",
-          code_button_disabled:false,
-        });
-        clearInterval(timer);
-      }else {
-        this.setState({
-          code_button_text:`${sec}S`
-        })
-      }
-    }, 1000);
-  }
-  toggleClick(value){
-    this.props.switchForm('register');
+
+  toggleClick(value) {
+    this.props.switchForm("register");
   }
   render() {
-    const {code_button_disabled,code_button_loading,code_button_text} = this.state;
+    const {userName,loginLoading} = this.state;
     return (
       <Fragment>
         <div className="form-header">
@@ -105,13 +69,13 @@ class loginForm extends Component {
               name="username"
               rules={[
                 {
-                  type: 'email',
+                  type: "email",
                   message: "邮箱格式不正确",
                 },
                 {
                   required: true,
-                    message:"邮箱不能为空"
-                }
+                  message: "邮箱不能为空",
+                },
               ]}
             >
               <Input
@@ -128,8 +92,8 @@ class loginForm extends Component {
                   message: "密码不能为空",
                 },
                 {
-                  pattern:validate_password,
-                  message:"请输入大于6位小于20位数字加字母"
+                  pattern: validate_password,
+                  message: "请输入大于6位小于20位数字加字母",
                 },
               ]}
             >
@@ -147,9 +111,9 @@ class loginForm extends Component {
                   message: "请输入验证码",
                 },
                 {
-                  len:6,
-                  message:"请输入长度为6位的验证码"
-                }
+                  len: 6,
+                  message: "请输入长度为6位的验证码",
+                },
               ]}
             >
               <Row gutter={13}>
@@ -161,9 +125,7 @@ class loginForm extends Component {
                   />
                 </Col>
                 <Col span={10}>
-                  <Button type="primary" danger block onClick={this.getCode.bind(this)} disabled={code_button_disabled} loading={code_button_loading}>
-                    {code_button_text}
-                  </Button>
+                  <CodeButton userName={userName}/>
                 </Col>
               </Row>
             </Form.Item>
@@ -173,6 +135,7 @@ class loginForm extends Component {
                 htmlType="submit"
                 className="login-form-button"
                 block
+                loading={loginLoading}
               >
                 登录
               </Button>
@@ -184,4 +147,4 @@ class loginForm extends Component {
   }
 }
 
-export default loginForm;
+export default withRouter(loginForm);
