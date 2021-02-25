@@ -11,3 +11,14 @@ export function Login(data){
         data
     })
 }
+
+/** 
+ * 获取验证码
+*/
+export function GetCode(data){
+    return service.request({
+        url:"/getSms/",
+        method:"post",
+        data
+    })
+}
