@@ -22,8 +22,10 @@ class AsideMenu extends React.Component {
   }
   componentDidMount() {
     const pathname = this.props.location.pathname;
-    const menuKey = pathname.split("/").slice(0, 3).join("/");
-    this.setMenu(pathname, menuKey);
+    if(pathname){
+        const menuKey = [pathname.split("/").slice(0, 3).join("/")];
+        this.setMenu(pathname, menuKey);
+    }
   }
   openMenu(openKeys){
     this.setState({
@@ -31,7 +33,7 @@ class AsideMenu extends React.Component {
     })
   }
   selectMenu({ key, keyPath }) {
-    this.setMenu(key, keyPath[keyPath.length - 1]);
+    this.setMenu(key, [keyPath[keyPath.length - 1]]);
   }
   setMenu(selectedKeys, openKeys) {
     this.setState({ selectedKeys, openKeys });
