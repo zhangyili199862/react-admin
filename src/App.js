@@ -13,7 +13,7 @@ class App extends React.Component {
       <HashRouter>
         <Switch>
           <Route component={Login} exact path="/" />
-          <PrivateRouter component={Index} exact path="/index" />
+          <PrivateRouter component={Index} path="/index" />
         </Switch>
       </HashRouter>
     );
