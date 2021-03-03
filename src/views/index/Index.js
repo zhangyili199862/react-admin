@@ -3,8 +3,8 @@ import "./index.scss";
 
 //组件
 import Aside from "./components/Aside";
-import ContainerMain from "../../components/containerMain/Index";
-import ContainerHeader from "../../components/containerHeader/Index";
+import ContainerMain from "@/components/containerMain/Index";
+import ContainerHeader from "@/components/containerHeader/Index";
 //antd
 import { Layout } from "antd";
 const { Header, Footer, Sider, Content } = Layout;
@@ -44,7 +44,6 @@ export default class Index extends React.Component {
           <Content className="layout-content">
             <ContainerMain />
           </Content>
-          <Footer>Footer</Footer>
         </Layout>
       </Layout>
     );

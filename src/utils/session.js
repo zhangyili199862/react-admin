@@ -1,6 +1,16 @@
+import cookies from "react-cookies"
+const token = "adminToken",username = "username"
 export function setToken(value){
-    sessionStorage.setItem('adminToken',value)
+    cookies.save('adminToken',value);
 };
+
 export function getToken(){
-    return sessionStorage.getItem('adminToken')
+    return cookies.load(token);
+}
+
+export function setUserName(value){
+    cookies.save(username,value);
+};
+export function getUserName(){
+    return cookies.load(username);
 };

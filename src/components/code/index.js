@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import { Button, message } from "antd";
 //api
-import { GetCode } from "../../api/account";
+import { GetCode } from "@/api/account";
 let timer = null;
 export default class Code extends Component {
   constructor(props) {

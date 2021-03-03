@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import "./aside.scss";
-import AsideMenu from "../../../components/asideMenu/Index"
+import AsideMenu from "@/components/asideMenu/Index"
 //andt
 export default class Aside extends React.Component {
   constructor(props) {

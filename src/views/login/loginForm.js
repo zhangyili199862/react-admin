@@ -3,11 +3,11 @@ import "./index.scss";
 //组件
 import { Form, Input, Button, Row, Col } from "antd";
 import { UserOutlined, UnlockOutlined } from "@ant-design/icons";
-import { validate_password } from "../../utils/validate";
-import {setToken} from "../../utils/session";
-import CodeButton from "../../components/code/index"
+import { validate_password } from "@/utils/validate";
+import {setToken,setUserName} from "@/utils/session";
+import CodeButton from "@/components/code/index"
 //接口
-import { Login } from "../../api/account";
+import { Login } from "@/api/account";
 import { withRouter } from "react-router-dom";
 class loginForm extends Component {
   constructor() {
@@ -24,10 +24,12 @@ class loginForm extends Component {
     this.setState({
       loginLoading:true
     })
-    Login()
+    Login(values)
       .then((res) => {
-        setToken('123');
-        console.log(res);
+        let data = res.data.data;
+        const {token,username} = data;
+        setToken(token);
+        setUserName(username);
         this.props.history.push('/index');
       })
       .catch((e) => {

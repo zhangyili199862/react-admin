@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import Router from "../../router/index";
+import Router from "@/router/index";
 import { Link, withRouter } from "react-router-dom";
 //andt
 import { Menu } from "antd";
