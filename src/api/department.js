@@ -34,3 +34,14 @@ export function DepartmentDelete(data){
     })
 }
 
+/** 
+ * 部门禁启用
+*/
+
+export function DepartmentStatusEdit(data){
+    return service.request({
+        url:"/department/status/",
+        method:"post",
+        data
+    })
+}

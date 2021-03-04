@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 //antd
 import { Form, Input, message, Button, Table, Switch,Modal } from "antd";
-import { DepartmentList, DepartmentDelete } from "@/api/department";
+import { DepartmentList, DepartmentDelete,DepartmentStatusEdit } from "@/api/department";
 export default class DepartList extends React.Component {
   constructor(props) {
     super(props);
@@ -13,6 +13,7 @@ export default class DepartList extends React.Component {
       selectRowKeys: [],
       //警告弹窗
       visible:false,
+      confirmLoading:false,//弹窗Loading
       id:"",
       columns: [
         {
@@ -25,7 +26,7 @@ export default class DepartList extends React.Component {
           dataIndex: "status",
           key: "status",
           render: (text, rowData) => {
-            return <Switch defaultChecked={rowData.status}></Switch>;
+            return <Switch onChange={this.onHandlerSwitch} defaultChecked={rowData.status}></Switch>;
           },
         },
         {
@@ -96,14 +97,37 @@ export default class DepartList extends React.Component {
       return false;
     }
     this.setState({
-      id
+      id,
+      visible:true
     })
   };
+  onHandlerSwitch(data,$e){
+    console.log(data,$e);
+    // if(!id){
+    //   return false;
+    // }
+    // DepartmentStatusEdit(id).then(res=>{
+    //   console.log(res)
+    // })
+  }
   modalThen(){
+    this.setState({
+      confirmLoading:true
+    });
     const {id} = this.state;
     DepartmentDelete({ id })
       .then((res) => {
+        this.setState({
+          visible:false,
+          id:"",
+          confirmLoading:false
+        })
         message.info("删除成功！");
+      }).catch(err=>{
+        this.setState({
+          confirmLoading:false
+        });
+        message.error('删除失败！')
       })
       .finally(() => {
         this.loadData();
@@ -111,7 +135,8 @@ export default class DepartList extends React.Component {
   }
   hideModal(){
     this.setState({
-      visible:false
+      visible:false,
+      id:""
     })
   }
   render() {
@@ -143,10 +168,11 @@ export default class DepartList extends React.Component {
           visible={this.state.visible}
           onOk={this.modalThen}
           onCancel={this.hideModal}
+          confirmLoading={this.confirmLoading}
           okText="确认"
           cancelText="取消"
         >
-          <p className="text-center">确认删除信息？<strong className="text-red">删除后降无法恢复。</strong></p>
+          <p className="text-center">确认删除信息？<strong className="text-red">删除后将无法恢复。</strong></p>
         </Modal>
       </Fragment>
     );
