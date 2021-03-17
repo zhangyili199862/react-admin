@@ -11,7 +11,17 @@ export function DepartmentAdd(data){
         data
     })
 }
+/** 
+ * 部门编辑
+*/
 
+export function DepartmentEdit(data){
+    return service.request({
+        url:"/department/edit/",
+        method:"post",
+        data
+    })
+}
 /** 
  * 部门列表
 */
@@ -41,6 +51,18 @@ export function DepartmentDelete(data){
 export function DepartmentStatusEdit(data){
     return service.request({
         url:"/department/status/",
+        method:"post",
+        data
+    })
+}
+
+/** 
+ * 详情
+*/
+
+export function DepartmentDetailed(data){
+    return service.request({
+        url:"/department/detailed/",
         method:"post",
         data
     })

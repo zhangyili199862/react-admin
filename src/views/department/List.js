@@ -1,7 +1,9 @@
 import React, { Fragment } from "react";
 //antd
-import { Form, Input, message, Button, Table, Switch,Modal } from "antd";
-import { DepartmentList, DepartmentDelete,DepartmentStatusEdit } from "@/api/department";
+import { Button, Switch } from "antd";
+import { Link } from "react-router-dom";
+//组件
+import TableComponent from "@/components/tableData/Index";
 export default class DepartList extends React.Component {
   constructor(props) {
     super(props);
@@ -12,168 +14,96 @@ export default class DepartList extends React.Component {
       //复选框数据
       selectRowKeys: [],
       //警告弹窗
-      visible:false,
-      confirmLoading:false,//弹窗Loading
-      id:"",
-      columns: [
-        {
-          title: "部门",
-          dataIndex: "name",
-          key: "name",
-        },
-        {
-          title: "禁启用",
-          dataIndex: "status",
-          key: "status",
-          render: (text, rowData) => {
-            return <Switch onChange={this.onHandlerSwitch} defaultChecked={rowData.status}></Switch>;
-          },
-        },
-        {
-          title: "人员数量",
-          dataIndex: "number",
-          key: "number",
-        },
-        {
-          title: "操作",
-          dataIndex: "operation",
-          key: "operation",
-          width: 215,
-          render: (text, rowData) => {
-            return (
-              <div className="inline-button">
-                <Button type="primary">编辑</Button>
-                <Button onClick={() => this.onHandleDelete(rowData.id)}>
-                  删除
-                </Button>
-              </div>
-            );
-          },
-        },
-      ],
+      visible: false,
+      confirmLoading: false, //弹窗Loading
+      id: "",
+      tableLoading: false,
       dataSource: [],
+      //控制开关
+      changgeId: "",
+      tableConfig: {
+        url: "department",
+        method: "post",
+        rowKey: "id",
+        checkBox: true,
+        batchButton: false,
+        thead: [
+          {
+            title: "部门",
+            dataIndex: "name",
+            key: "name",
+          },
+          {
+            title: "禁启用",
+            dataIndex: "status",
+            key: "status",
+            render: (text, rowData) => {
+              return (
+                <Switch
+                  onChange={() => this.handleSwitch(rowData)}
+                  loading={rowData.id === this.state.changgeId}
+                  defaultChecked={rowData.status}
+                ></Switch>
+              );
+            },
+          },
+          {
+            title: "人员数量",
+            dataIndex: "number",
+            key: "number",
+          },
+          {
+            title: "操作",
+            dataIndex: "operation",
+            key: "operation",
+            width: 215,
+            render: (text, rowData) => {
+              return (
+                <div className="inline-button">
+                  <Button type="primary">
+                    <Link
+                      to={{
+                        pathname: "/index/department/add",
+                        state: { id: rowData.id },
+                      }}
+                    >
+                      编辑
+                    </Link>
+                  </Button>
+                  <Button onClick={() => this.delete(rowData.id)}>删除</Button>
+                </div>
+              );
+            },
+          },
+        ],
+      },
     };
-    this.onFinish = this.onFinish.bind(this);
-    this.loadData = this.loadData.bind(this);
-    this.onCheckBox = this.onCheckBox.bind(this);
-    this.onHandleDelete = this.onHandleDelete.bind(this);
-    this.hideModal = this.hideModal.bind(this);
-    this.modalThen = this.modalThen.bind(this);
+    this.getChildRef = this.getChildRef.bind(this);
+    this.handleSwitch = this.handleSwitch.bind(this);
   }
-  onFinish(value) {
+  
+  getChildRef(ref) {
+    this.tableComponent = ref;
+  }
+  delete(id) {
+    this.tableComponent.onHandleDelete(id);
+  }
+  handleSwitch(data) {
     this.setState({
-      keyWork: value.name,
+      changgeId: data.id,
     });
-    this.loadData();
-  }
-  componentDidMount() {
-    this.loadData();
-  }
-  loadData() {
-    const { pageNumber, pageSize, keyWork } = this.state;
-    const requestData = {
-      pageNumber,
-      pageSize,
-    };
-    if (keyWork !== "") {
-      requestData.name = keyWork;
-    }
-    DepartmentList(requestData).then((res) => {
-      const resData = res.data.data;
-      if (resData) {
-        this.setState({
-          dataSource: resData.data,
-        });
-      }
-    });
-  }
-  onCheckBox(selectKeys) {
-    this.setState({
-      selectRowKeys: selectKeys,
-    });
-  };
-  onHandleDelete(id) {
-    if (!id) {
-      return false;
-    }
-    this.setState({
-      id,
-      visible:true
-    })
-  };
-  onHandlerSwitch(data,$e){
-    console.log(data,$e);
-    // if(!id){
-    //   return false;
-    // }
-    // DepartmentStatusEdit(id).then(res=>{
-    //   console.log(res)
-    // })
-  }
-  modalThen(){
-    this.setState({
-      confirmLoading:true
-    });
-    const {id} = this.state;
-    DepartmentDelete({ id })
-      .then((res) => {
-        this.setState({
-          visible:false,
-          id:"",
-          confirmLoading:false
-        })
-        message.info("删除成功！");
-      }).catch(err=>{
-        this.setState({
-          confirmLoading:false
-        });
-        message.error('删除失败！')
-      })
-      .finally(() => {
-        this.loadData();
-      });
-  }
-  hideModal(){
-    this.setState({
-      visible:false,
-      id:""
-    })
+    this.setState({ id: data.id });
+    this.tableComponent.onHandlerSwitch(data);
+    this.setState({ changgeId: "" });
   }
   render() {
-    const { columns, dataSource } = this.state;
-    const rowSelection = {
-      onChange: this.onCheckBox,
-    };
+    const { tableConfig } = this.state;
     return (
       <Fragment>
-        <Form layout="inline" onFinish={this.onFinish}>
-          <Form.Item label="部门名称" name="name">
-            <Input placeholder="请输入部门名称" />
-          </Form.Item>
-          <Form.Item shouldUpdate={true}>
-            <Button type="primary" htmlType="submit">
-              搜索
-            </Button>
-          </Form.Item>
-        </Form>
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={dataSource}
-          bordered
-          rowSelection={rowSelection}
-        ></Table>
-        <Modal
-          title="Modal"
-          visible={this.state.visible}
-          onOk={this.modalThen}
-          onCancel={this.hideModal}
-          confirmLoading={this.confirmLoading}
-          okText="确认"
-          cancelText="取消"
-        >
-          <p className="text-center">确认删除信息？<strong className="text-red">删除后将无法恢复。</strong></p>
-        </Modal>
+        <TableComponent
+          onRef={this.getChildRef}
+          config={tableConfig}
+        ></TableComponent>
       </Fragment>
     );
   }

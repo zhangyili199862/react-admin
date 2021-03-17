@@ -3,13 +3,14 @@ import React from "react";
 import { Form, Input, InputNumber, Button, Radio, message } from "antd";
 
 //API
-import { DepartmentAdd } from "@/api/department";
+import { DepartmentAdd, DepartmentDetailed,DepartmentEdit } from "@/api/department";
 export default class DepartAdd extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       buttonLoading: false,
       buttonDisabled: false,
+      id: "",
     };
     this.onSubmit = this.onSubmit.bind(this);
   }
@@ -29,6 +30,11 @@ export default class DepartAdd extends React.Component {
     this.setState({
       buttonLoading: true,
     });
+    this.state.id === ""
+      ? this.handlerDepartAdd(formObj)
+      : this.handlerDepartEdit(formObj);
+  }
+  handlerDepartAdd(formObj) {
     DepartmentAdd(formObj)
       .then((res) => {
         message.success(res.data.message);
@@ -39,6 +45,37 @@ export default class DepartAdd extends React.Component {
           buttonLoading: false,
         });
       });
+  }
+  handlerDepartEdit(formObj) {
+    const requestData = formObj;
+    requestData.id = this.state.id;
+    DepartmentEdit(requestData)
+      .then((res) => {
+        message.success(res.data.message);
+      })
+      .finally(() => {
+        this.setState({
+          buttonLoading: false,
+        });
+      });
+  }
+  componentWillMount() {
+    if (this.props.location.state) {
+      this.setState({
+        id: this.props.location.state.id,
+      });
+    }
+  }
+  componentDidMount() {
+    this.getDetail();
+  }
+  getDetail() {
+    if (!this.props.location.state) return;
+    const { id } = this.state;
+    DepartmentDetailed({ id }).then((res) => {
+      const data = res.data.data;
+      this.refs.form.setFieldsValue(data);
+    });
   }
   render() {
     const formLayout = {
