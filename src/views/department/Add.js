@@ -2,6 +2,7 @@ import React from "react";
 
 import { Form, Input, InputNumber, Button, Radio, message } from "antd";
 
+import FormCom from "@/components/form/Index"
 //API
 import { DepartmentAdd, DepartmentDetailed,DepartmentEdit } from "@/api/department";
 export default class DepartAdd extends React.Component {
@@ -11,6 +12,16 @@ export default class DepartAdd extends React.Component {
       buttonLoading: false,
       buttonDisabled: false,
       id: "",
+      formItem:[{
+        label:'部门',
+        name:'dept',
+        type:'Input'
+      },{
+        label:'单位',
+        name:'unit',
+        type:'Select'
+      }
+    ]
     };
     this.onSubmit = this.onSubmit.bind(this);
   }
@@ -82,15 +93,16 @@ export default class DepartAdd extends React.Component {
         labelCol: { span: 2 },
         wrapperCol: { span: 22 },
       },
-      { buttonLoading, buttonDisabled } = this.state;
+      { buttonLoading, buttonDisabled,formItem } = this.state;
     return (
       <div>
+        <FormCom formItem={formItem} />
         <Form ref="form" {...formLayout} onFinish={this.onSubmit}>
           <Form.Item label="部门名称" name="name">
             <Input></Input>
           </Form.Item>
           <Form.Item label="人员数量" name="number">
-            <InputNumber initialValues={0}></InputNumber>
+            <InputNumber ></InputNumber>
           </Form.Item>
           <Form.Item label="禁启用" name="status">
             <Radio.Group defaultChecked={true}>
