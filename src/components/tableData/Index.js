@@ -2,9 +2,10 @@ import React from "react";
 
 import propTypes from "prop-types";
 import { requestUrl } from "@/api/requestUrl";
-import { TableList,TableDelete,TableStatus } from "@/api/common";
+import { TableList, TableDelete, TableStatus } from "@/api/common";
 import TableBasics from "./Table";
-import {Modal,message,Form, Input,Button} from 'antd'
+import FormSearch from "@/components/formSearch/Index";
+import { Modal, message } from "antd";
 export default class TableComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -12,7 +13,7 @@ export default class TableComponent extends React.Component {
       //请求参数
       pageNumber: 1,
       pageSize: 10,
-      keyWork: "",
+      searchData: "",
       //数据
       data: [],
       //加载
@@ -20,7 +21,7 @@ export default class TableComponent extends React.Component {
       //页码
       total: 0,
       //弹窗
-      visible:false,
+      visible: false,
       confirmLoading: false, //弹窗Loading
     };
     this.onChangeCurrentPage = this.onChangeCurrentPage.bind(this);
@@ -29,20 +30,15 @@ export default class TableComponent extends React.Component {
     this.onHandleDelete = this.onHandleDelete.bind(this);
     this.hideModal = this.hideModal.bind(this);
     this.modalThen = this.modalThen.bind(this);
-    this.onFinish  = this.onFinish.bind(this);
+    this.search = this.search.bind(this);
   }
   componentDidMount() {
     this.loadData();
     this.props.onRef(this);
   }
-  onFinish(value) {
-    this.setState({
-      keyWork: value.name,
-    });
-  }
   loadData() {
-    const { pageNumber, pageSize,keyWork } = this.state;
-
+    const { pageNumber, pageSize, searchData } = this.state;
+    console.log(searchData);
     const requestData = {
       url: requestUrl[this.props.config.url],
       method: "post",
@@ -51,7 +47,11 @@ export default class TableComponent extends React.Component {
         pageSize,
       },
     };
-    if(keyWork) {requestData.data.name = keyWork}
+    if (Object.keys(searchData).length !== 0) {
+      for (let key in searchData) {
+        requestData.data[key] = searchData[key];
+      }
+    }
     TableList(requestData).then((res) => {
       const resData = res.data.data;
       if (resData) {
@@ -109,17 +109,25 @@ export default class TableComponent extends React.Component {
       visible: true,
     });
   }
-  onHandlerSwitch(data){
+  onHandlerSwitch(data) {
     const requestData = {
-      url:requestUrl[`${this.props.config.url}Status`],
-      data:{
+      url: requestUrl[`${this.props.config.url}Status`],
+      data: {
         id: data.id,
         status: data.status ? false : true,
-      }
+      },
     };
-    TableStatus(requestData).then(res=>{
+    TableStatus(requestData).then((res) => {
       message.info("修改成功！");
-    })
+    });
+  }
+  search(value) {
+    this.setState({
+      pageNumber: 1,
+      pageSize: 10,
+      searchData: value,
+    });
+    this.loadData();
   }
   modalThen() {
     this.setState({
@@ -127,11 +135,11 @@ export default class TableComponent extends React.Component {
     });
     const { id } = this.state;
     let requestData = {
-      url:requestUrl[`${this.props.config.url}Delete`],
-      data:{
-        id
-      }
-    }
+      url: requestUrl[`${this.props.config.url}Delete`],
+      data: {
+        id,
+      },
+    };
     TableDelete(requestData)
       .then((res) => {
         this.setState({
@@ -152,14 +160,21 @@ export default class TableComponent extends React.Component {
       .finally(() => {});
   }
   render() {
-    const { thead, checkBox, batchButton,rowKey} = this.props.config;
+    const {
+      thead,
+      checkBox,
+      batchButton,
+      rowKey,
+      formItem,
+    } = this.props.config;
     const { data, total } = this.state;
     const rowSelection = {
       onChange: this.onCheckBox,
     };
     return (
       <React.Fragment>
-        <Form layout="inline" onFinish={this.onFinish}>
+        <FormSearch formItem={formItem} search={this.search} />
+        {/* <Form layout="inline" onFinish={this.onFinish}>
           <Form.Item label="部门名称" name="name">
             <Input placeholder="请输入部门名称" />
           </Form.Item>
@@ -169,17 +184,17 @@ export default class TableComponent extends React.Component {
             </Button>
           </Form.Item>
           <Form.Item></Form.Item>
-        </Form>
+        </Form> */}
         <TableBasics
           columns={thead}
           dataSource={data}
           total={total}
           changePageCurrent={this.onChangeCurrentPage}
           changePageSize={this.onChangeCurrentSize}
-          handlerDelete={()=>this.handlerDelete()}
+          handlerDelete={() => this.handlerDelete()}
           batchButton={batchButton}
           checkBox={checkBox}
-          rowSelection={checkBox ? rowSelection :null}
+          rowSelection={checkBox ? rowSelection : null}
           rowKey={rowKey}
         />
         <Modal

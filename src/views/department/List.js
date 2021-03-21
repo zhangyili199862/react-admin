@@ -76,12 +76,26 @@ export default class DepartList extends React.Component {
             },
           },
         ],
+        formItem: [
+          {
+            type: "Input",
+            label: "部门名称",
+            name: "name",
+            rules: [
+              {
+                required: true,
+                message: "部门名称不能为空",
+              },
+            ],
+            placeholder: "请输入部门名称",
+          },
+        ],
       },
     };
     this.getChildRef = this.getChildRef.bind(this);
     this.handleSwitch = this.handleSwitch.bind(this);
   }
-  
+
   getChildRef(ref) {
     this.tableComponent = ref;
   }

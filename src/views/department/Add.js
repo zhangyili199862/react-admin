@@ -18,6 +18,10 @@ export default class DepartAdd extends React.Component {
       id: "",
       formConfig: {
         url: "departmentAdd",
+        initValue: {
+          status: true,
+          number: 0,
+        },
       },
       formLayout: {
         labelCol: { span: 2 },
@@ -44,6 +48,12 @@ export default class DepartAdd extends React.Component {
           type: "InputNumber",
           min: 0,
           max: 100,
+          rules: [
+            {
+              required: true,
+              message: "人员数量名称不能为空",
+            },
+          ],
         },
         {
           label: "禁启用",
@@ -53,12 +63,24 @@ export default class DepartAdd extends React.Component {
             { label: "禁用", value: false },
             { label: "启动", value: true },
           ],
+          rules: [
+            {
+              required: true,
+              message: "禁启用不能为空",
+            },
+          ],
           defaultValue: true,
         },
         {
           label: "描述",
           name: "content",
           type: "TextArea",
+          rules: [
+            {
+              required: true,
+              message: "描述不能为空",
+            },
+          ],
         },
       ],
     };

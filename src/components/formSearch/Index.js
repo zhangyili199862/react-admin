@@ -1,10 +1,11 @@
 import React from "react";
-import { Form, Button, Input, Select, InputNumber, Radio, message } from "antd";
+import { Form, Button, Input, Select, InputNumber, Radio } from "antd";
+// import { requestUrl } from "@/api/requestUrl";
+// import { FormSubmit } from "@/api/common";
 import propTypes from "prop-types";
-import { requestUrl } from "@/api/requestUrl";
-import { FormSubmit } from "@/api/common";
+import { global } from "@/js/global";
 const { Option } = Select;
-export default class FormCom extends React.Component {
+export default class FormSearch extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -120,6 +121,7 @@ export default class FormCom extends React.Component {
         formList.push(this.initInput(item));
       }
       if (item.type === "Select") {
+        item.options = global[item.key];
         formList.push(this.initSelect(item));
       }
       if (item.type === "InputNumber") {
@@ -136,47 +138,55 @@ export default class FormCom extends React.Component {
     return formList;
   }
   onSubmit(value) {
-    this.setState({
-      buttonLoading: true,
-    });
-    const data = {
-      url: requestUrl[this.props.formConfig.url],
-      data: value,
-    };
-    FormSubmit(data)
-      .then((res) => {
-        message.success(res.data.message);
-        this.refs.form.resetFields();
-      })
-      .finally(() => {
-        this.setState({
-          buttonLoading: false,
-        });
-      });
+    const searchData = {};
+    for (let key in value) {
+      if (value[key] !== undefined && value[key] !== "") {
+        searchData[key] = value[key];
+      }
+    }
+    this.props.search(searchData);
+    // this.setState({
+    //   buttonLoading: true,
+    // });
+    // const data = {
+    //   url: requestUrl[this.props.formConfig.url],
+    //   data: value,
+    // };
+    // FormSubmit(data)
+    //   .then((res) => {
+    //     message.success(res.data.message);
+    //     this.refs.form.resetFields();
+    //   })
+    //   .finally(() => {
+    //     this.setState({
+    //       buttonLoading: false,
+    //     });
+    //   });
   }
   render() {
     const { formLayout, formConfig } = this.props;
     const { buttonLoading } = this.state;
     return (
       <Form
+        layout="inline"
         ref="form"
         {...formLayout}
-        onFinish={this.onSubmit}
         initialValues={formConfig.initValue}
+        onFinish={this.onSubmit}
       >
         {this.initFormItem()}
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={buttonLoading}>
-            确定
+            搜索
           </Button>
         </Form.Item>
       </Form>
     );
   }
 }
-FormCom.propTypes = {
+FormSearch.propTypes = {
   formConfig: propTypes.object,
 };
-FormCom.defaultProps = {
+FormSearch.defaultProps = {
   formConfig: {},
 };
