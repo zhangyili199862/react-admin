@@ -32,3 +32,15 @@ export function TableStatus(params){
         data:params.data
     })
 }
+
+/**
+ * 表单提交
+ */
+
+export function FormSubmit(params){
+    return service.request({
+        url:params.url,
+        method:params.method || "post",
+        data:params.data
+    })
+}

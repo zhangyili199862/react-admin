@@ -1,10 +1,14 @@
 import React from "react";
 
-import { Form, Input, InputNumber, Button, Radio, message } from "antd";
+import { message } from "antd";
 
-import FormCom from "@/components/form/Index"
+import FormCom from "@/components/form/Index";
 //API
-import { DepartmentAdd, DepartmentDetailed,DepartmentEdit } from "@/api/department";
+import {
+  DepartmentAdd,
+  DepartmentDetailed,
+  DepartmentEdit,
+} from "@/api/department";
 export default class DepartAdd extends React.Component {
   constructor(props) {
     super(props);
@@ -12,35 +16,56 @@ export default class DepartAdd extends React.Component {
       buttonLoading: false,
       buttonDisabled: false,
       id: "",
-      formItem:[{
-        label:'部门',
-        name:'dept',
-        type:'Input'
-      },{
-        label:'单位',
-        name:'unit',
-        type:'Select'
-      }
-    ]
+      formConfig: {
+        url: "departmentAdd",
+      },
+      formLayout: {
+        labelCol: { span: 2 },
+        wrapperCol: { span: 22 },
+      },
+      formItem: [
+        {
+          label: "部门名称",
+          name: "name",
+          type: "Input",
+          rules: [
+            {
+              required: true,
+              message: "部门名称不能为空",
+            },
+          ],
+          style: {
+            width: "150px",
+          },
+        },
+        {
+          label: "人员数量",
+          name: "number",
+          type: "InputNumber",
+          min: 0,
+          max: 100,
+        },
+        {
+          label: "禁启用",
+          name: "status",
+          type: "Radio",
+          options: [
+            { label: "禁用", value: false },
+            { label: "启动", value: true },
+          ],
+          defaultValue: true,
+        },
+        {
+          label: "描述",
+          name: "content",
+          type: "TextArea",
+        },
+      ],
     };
     this.onSubmit = this.onSubmit.bind(this);
   }
   onSubmit(formObj) {
-    if (!formObj.name) {
-      message.error("部门名称不能为空");
-      return false;
-    }
-    if (!formObj.number || formObj.number === 0) {
-      message.error("人员数量不能为0");
-      return false;
-    }
-    if (!formObj.content) {
-      message.error("部门描述不能为空");
-      return false;
-    }
-    this.setState({
-      buttonLoading: true,
-    });
+    if (!formObj) return;
     this.state.id === ""
       ? this.handlerDepartAdd(formObj)
       : this.handlerDepartEdit(formObj);
@@ -89,41 +114,14 @@ export default class DepartAdd extends React.Component {
     });
   }
   render() {
-    const formLayout = {
-        labelCol: { span: 2 },
-        wrapperCol: { span: 22 },
-      },
-      { buttonLoading, buttonDisabled,formItem } = this.state;
+    const { formItem, formLayout, formConfig } = this.state;
     return (
       <div>
-        <FormCom formItem={formItem} />
-        <Form ref="form" {...formLayout} onFinish={this.onSubmit}>
-          <Form.Item label="部门名称" name="name">
-            <Input></Input>
-          </Form.Item>
-          <Form.Item label="人员数量" name="number">
-            <InputNumber ></InputNumber>
-          </Form.Item>
-          <Form.Item label="禁启用" name="status">
-            <Radio.Group defaultChecked={true}>
-              <Radio value={false}>禁用</Radio>
-              <Radio value={true}>启用</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item label="描述" name="content">
-            <Input.TextArea></Input.TextArea>
-          </Form.Item>
-          <Form.Item>
-            <Button
-              loading={buttonLoading}
-              disabled={buttonDisabled}
-              htmlType="submit"
-              type="primary"
-            >
-              确定
-            </Button>
-          </Form.Item>
-        </Form>
+        <FormCom
+          formItem={formItem}
+          formLayout={formLayout}
+          formConfig={formConfig}
+        />
       </div>
     );
   }
