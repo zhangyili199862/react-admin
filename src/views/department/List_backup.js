@@ -3,12 +3,7 @@ import React, { Fragment } from "react";
 import { Button, Switch } from "antd";
 import { Link } from "react-router-dom";
 //组件
-import Table from "@/components/tableData/Table";
-import FormSearch from "@/components/formSearch/Index"
-//Store
-import Store from "@/store/Index"
-
-import {addStatus,updateStatus} from "@/store/action/config"
+import TableComponent from "@/components/tableData/Index";
 export default class DepartList extends React.Component {
   constructor(props) {
     super(props);
@@ -81,39 +76,26 @@ export default class DepartList extends React.Component {
             },
           },
         ],
+        formItem: [
+          {
+            type: "Input",
+            label: "部门名称",
+            name: "name",
+            rules: [
+              {
+                required: true,
+                message: "部门名称不能为空",
+              },
+            ],
+            placeholder: "请输入部门名称",
+          },
+        ],
       },
-      formItem: [
-        {
-          type: "Input",
-          label: "部门名称",
-          name: "name",
-          rules: [
-            {
-              required: true,
-              message: "部门名称不能为空",
-            },
-          ],
-          placeholder: "请输入部门名称",
-        },
-        {
-          type:"Select",
-          label:"禁启用",
-          name:"status",
-          key:'status'
-        }
-      ],
     };
     this.getChildRef = this.getChildRef.bind(this);
     this.handleSwitch = this.handleSwitch.bind(this);
   }
-  componentDidMount(){
-    Store.subscribe(()=>{
-      console.log(Store.getState())
-    })
-    Store.dispatch(addStatus("所有","all"));
-    console.log(updateStatus);
-    Store.dispatch(updateStatus("不禁用",false))
-  }
+
   getChildRef(ref) {
     this.tableComponent = ref;
   }
@@ -129,14 +111,13 @@ export default class DepartList extends React.Component {
     this.setState({ changgeId: "" });
   }
   render() {
-    const { tableConfig,formItem } = this.state;
+    const { tableConfig } = this.state;
     return (
       <Fragment>
-        <FormSearch formItem={formItem}/>
-        <Table
+        <TableComponent
           onRef={this.getChildRef}
           config={tableConfig}
-        ></Table>
+        ></TableComponent>
       </Fragment>
     );
   }

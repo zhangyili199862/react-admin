@@ -3,9 +3,11 @@ import { Form, Button, Input, Select, InputNumber, Radio } from "antd";
 // import { requestUrl } from "@/api/requestUrl";
 // import { FormSubmit } from "@/api/common";
 import propTypes from "prop-types";
+import { connect } from "react-redux";
 import { global } from "@/js/global";
+import Store from "@/store/Index";
 const { Option } = Select;
-export default class FormSearch extends React.Component {
+class FormSearch extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -115,13 +117,14 @@ export default class FormSearch extends React.Component {
     if (!formItem || (formItem && formItem.length === 0)) {
       return false;
     }
-    let formList = [];
+    let formList = [],{config} = Store.getState();
+    
     formItem.map((item) => {
       if (item.type === "Input") {
         formList.push(this.initInput(item));
       }
       if (item.type === "Select") {
-        item.options = global[item.key];
+        item.options = config[item.key];
         formList.push(this.initSelect(item));
       }
       if (item.type === "InputNumber") {
@@ -190,3 +193,10 @@ FormSearch.propTypes = {
 FormSearch.defaultProps = {
   formConfig: {},
 };
+// const mapStateToProps = (state) => {
+//   return { config: state.config };
+// };
+// const mapDispatchToProps = (state) => {
+//   return { config: state.config };
+// };
+export default FormSearch;

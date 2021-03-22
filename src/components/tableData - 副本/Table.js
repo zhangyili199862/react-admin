@@ -1,21 +1,31 @@
 import React from "react";
 import { Table, Pagination, Row, Col, Button } from "antd";
-
-// import { connect } from "react-redux";
 import propTypes from "prop-types";
-import FormSearch from "../formSearch/Index";
-class TableBasics extends React.Component {
+export default class TableBasics extends React.Component {
   render() {
-    const { thead } = this.props.config;
-
+    const {
+      columns,
+      dataSource,
+      total,
+      batchButton,
+      changePageCurrent,
+      changePageSize,
+      handlerDelete,
+      rowSelection,
+      rowKey
+    } = this.props;
+    
     return (
       <React.Fragment>
-        {/* dataSource={dataSource}
-        rowSelection={rowSelection}
-        rowKey={rowKey} */}
-        <div style={{ marginBottom: "30px" }}></div>
-        <Table pagination={false} columns={thead} bordered />
-        {/* 
+        <Table
+          pagination={false}
+          columns={columns}
+          dataSource={dataSource}
+          rowSelection={rowSelection}
+          rowKey={rowKey}
+          bordered
+        />
+        <div style={{marginBottom:'30px'}}></div>
         <Row>
           <Col span={8} className="float-left">
             {batchButton && <Button onClick={handlerDelete}>批量删除</Button>}
@@ -32,7 +42,7 @@ class TableBasics extends React.Component {
               showTotal={(total) => `Total ${total} items`}
             />
           </Col>
-        </Row> */}
+        </Row>
       </React.Fragment>
     );
   }
@@ -40,25 +50,18 @@ class TableBasics extends React.Component {
 TableBasics.propTypes = {
   columns: propTypes.array,
   dataSource: propTypes.array,
-  total: propTypes.number,
-  changePageCurrent: propTypes.func,
-  changePageSize: propTypes.func,
-  batchButton: propTypes.bool,
-  rowSelection: propTypes.object,
-  rowKey: propTypes.string,
+  total:propTypes.number,
+  changePageCurrent:propTypes.func,
+  changePageSize:propTypes.func,
+  batchButton:propTypes.bool,
+  rowSelection:propTypes.object,
+  rowKey:propTypes.string
 };
 TableBasics.defaultProps = {
   columns: [],
   dataSource: [],
-  total: 0,
-  batchButton: true,
-  rowSelection: null,
-  rowKey: "id",
+  total:0,
+  batchButton:true,
+  rowSelection:null,
+  rowKey:"id"
 };
-// const mapStateToProps = (state)=>{
-//   return {config:state.config}
-// }
-// const mapDispatchToProps = (state)=>{
-//   return {config:state.config}
-// }
-export default TableBasics;
