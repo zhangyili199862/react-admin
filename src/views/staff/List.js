@@ -4,11 +4,11 @@ import { Button, Switch } from "antd";
 import { Link } from "react-router-dom";
 //组件
 import TableComponent from "@/components/tableDataUse/Index";
-// //Store
+//Store
 // import Store from "@/store/Index"
 
 // import {addStatus,updateStatus} from "@/store/action/config"
-export default class DepartList extends React.Component {
+export default class StaffList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -26,14 +26,19 @@ export default class DepartList extends React.Component {
       //控制开关
       changgeId: "",
       tableConfig: {
-        url: "department",
+        url: "job",
         method: "post",
-        rowKey: "id",
+        rowKey: "jobId",
         checkBox: true,
         batchButton: false,
         thead: [
           {
-            title: "部门",
+            title: "职位名称",
+            dataIndex: "jobName",
+            key: "jobName",
+          },
+          {
+            title: "部门名称",
             dataIndex: "name",
             key: "name",
           },
@@ -52,11 +57,6 @@ export default class DepartList extends React.Component {
             },
           },
           {
-            title: "人员数量",
-            dataIndex: "number",
-            key: "number",
-          },
-          {
             title: "操作",
             dataIndex: "operation",
             key: "operation",
@@ -67,14 +67,14 @@ export default class DepartList extends React.Component {
                   <Button type="primary">
                     <Link
                       to={{
-                        pathname: "/index/department/add",
-                        state: { id: rowData.id },
+                        pathname: "/index/job/add",
+                        state: { id: rowData.jobId },
                       }}
                     >
                       编辑
                     </Link>
                   </Button>
-                  <Button onClick={() => this.delete(rowData.id)}>删除</Button>
+                  <Button onClick={() => this.delete(rowData.jobId)}>删除</Button>
                 </div>
               );
             },
@@ -113,9 +113,9 @@ export default class DepartList extends React.Component {
   }
   handleSwitch(data) {
     this.setState({
-      changgeId: data.id,
+      changgeId: data.jobId,
     });
-    this.setState({ id: data.id });
+    this.setState({ id: data.jobId });
     this.tableComponent.onHandlerSwitch(data);
     this.setState({ changgeId: "" });
   }

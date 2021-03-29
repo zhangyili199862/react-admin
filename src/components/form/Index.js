@@ -1,8 +1,13 @@
 import React from "react";
-import { Form, Button, Input, Select, InputNumber, Radio, message } from "antd";
+import { Form, Button, Input, Select, InputNumber, Radio, message, DatePicker } from "antd";
+import 'moment/locale/zh-cn';
+import locale from 'antd/es/date-picker/locale/zh_CN';
 import propTypes from "prop-types";
 import { requestUrl } from "@/api/requestUrl";
 import { FormSubmit } from "@/api/common";
+import SelectCom from "@/components/select/index";
+//scss
+import "./form.scss"
 const { Option } = Select;
 export default class FormCom extends React.Component {
   constructor(props) {
@@ -13,11 +18,21 @@ export default class FormCom extends React.Component {
         wrapperCol: { span: 22 },
       },
     };
+    this.form = React.createRef();
     this.initFormItem = this.initFormItem.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.initInputNumber = this.initInputNumber.bind(this);
   }
-
+  componentWillReceiveProps({ formConfig }) {
+    this.refs.Form.setFieldsValue(formConfig.setFieldsValue);
+  }
+  componentDidMount() {
+    // const {formConfig} = this.props;
+    // if(formConfig.setFieldValue){
+    //   this.refs.Form.setFieldsValue(formConfig.setFieldsValue)
+    // }
+    this.props.onRef && this.props.onRef(this);
+  }
   /**
    * Input
    */
@@ -54,7 +69,49 @@ export default class FormCom extends React.Component {
       </Form.Item>
     );
   }
-
+  /**
+   * SelectComponent
+   */
+  initSelectComponent(item) {
+    return (
+      <Form.Item
+        label={item.label}
+        name={item.name}
+        key={item.name}
+        rules={[
+          ...item.rules,
+          {
+            validator: this.validatorSelect,
+          },
+        ]}
+      >
+        <SelectCom url={item.url} keyConfig={item.keyConfig} name={item.name} />
+      </Form.Item>
+    );
+  }
+  //插槽
+  slotElem(item) {
+    return (
+      <Form.Item
+        label={item.label}
+        name={item.name}
+        key={item.name}
+        rules={item.rules}
+      >
+        {/* {this.props.children ? this.props.children.filter(elem => elem.ref === item.slotName) : ""} */}
+        {/* {判断是否是数组} */}
+        {this.props.children && Array.isArray(this.props.children)
+          ? this.props.children.filter((elem) => elem.ref === item.slotName)
+          : this.props.children}
+      </Form.Item>
+    );
+  }
+  validatorSelect(rule, value) {
+    if (value || value[rule.field]) {
+      return Promise.resolve();
+    }
+    return Promise.reject(new Error("选项不能为空！"));
+  }
   /*
     InputNumber
   */
@@ -109,6 +166,31 @@ export default class FormCom extends React.Component {
       </Form.Item>
     );
   }
+  /**
+   * Column
+   */
+  initColumn(item) {
+    return (
+      <div className="form-column">
+        <h4>{item.label}</h4>
+      </div>
+    );
+  }
+  /**
+   * Date
+   */
+  initDate(item){
+    return (
+      <Form.Item
+        label={item.label}
+        name={item.name}
+        key={item.name}
+        rules={item.rules ?? []}
+      >
+        <DatePicker locale={locale} format={item.format} picker={item.mode}/>
+      </Form.Item>
+    );
+  }
   initFormItem() {
     const { formItem } = this.props;
     if (!formItem || (formItem && formItem.length === 0)) {
@@ -131,22 +213,52 @@ export default class FormCom extends React.Component {
       if (item.type === "TextArea") {
         formList.push(this.initTextArea(item));
       }
+      if (item.type === "SelectComponent") {
+        formList.push(this.initSelectComponent(item));
+      }
+      if (item.type === "Slot") {
+        formList.push(this.slotElem(item));
+      }
+      if (item.type === "Column") {
+        formList.push(this.initColumn(item));
+      }
+      if(item.type === 'Date'){
+        formList.push(this.initDate(item));
+      }
       return false;
     });
     return formList;
+  }
+  formatData(value) {
+    let requestData = JSON.parse(JSON.stringify(value));
+    const { formatKey, editKey, setFieldsValue } = this.props.formConfig;
+    let keyValue = requestData[formatKey];
+    if (Object.prototype.toString.call(keyValue) === "[object Object]") {
+      requestData[formatKey] = keyValue[formatKey];
+    }
+    if (editKey) {
+      requestData[editKey] = setFieldsValue[editKey];
+    }
+    return requestData;
+    // if (formatKey && value[formatKey]) {
+    //   const dataKey = value[formatKey];
+    //   delete value[formatKey];
+    //   value = Object.assign(value, dataKey);
+    // }
   }
   onSubmit(value) {
     this.setState({
       buttonLoading: true,
     });
+    const requestData = this.formatData(value);
     const data = {
       url: requestUrl[this.props.formConfig.url],
-      data: value,
+      data: requestData,
     };
     FormSubmit(data)
       .then((res) => {
         message.success(res.data.message);
-        this.refs.form.resetFields();
+        // this.refs.form.resetFields();
       })
       .finally(() => {
         this.setState({
@@ -155,15 +267,10 @@ export default class FormCom extends React.Component {
       });
   }
   render() {
-    const { formLayout, formConfig } = this.props;
+    const { formLayout } = this.props;
     const { buttonLoading } = this.state;
     return (
-      <Form
-        ref="form"
-        {...formLayout}
-        onFinish={this.onSubmit}
-        initialValues={formConfig.initValue}
-      >
+      <Form ref="Form" {...formLayout} onFinish={this.onSubmit}>
         {this.initFormItem()}
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={buttonLoading}>

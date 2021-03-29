@@ -3,8 +3,8 @@ import React from "react";
 import propTypes from "prop-types";
 import { requestUrl } from "@/api/requestUrl";
 import { TableList, TableDelete, TableStatus } from "@/api/common";
+import FormSearch from "../formSearch/Index"
 import TableBasics from "./Table";
-import FormSearch from "@/components/formSearch/Index";
 import { Modal, message } from "antd";
 export default class TableComponent extends React.Component {
   constructor(props) {
@@ -38,7 +38,6 @@ export default class TableComponent extends React.Component {
   }
   loadData() {
     const { pageNumber, pageSize, searchData } = this.state;
-    console.log(searchData);
     const requestData = {
       url: requestUrl[this.props.config.url],
       method: "post",
@@ -110,10 +109,12 @@ export default class TableComponent extends React.Component {
     });
   }
   onHandlerSwitch(data) {
+    console.log(this.props.config)
+    const {rowKey} = this.props.config;
     const requestData = {
       url: requestUrl[`${this.props.config.url}Status`],
       data: {
-        id: data.id,
+        id: data[rowKey],
         status: data.status ? false : true,
       },
     };

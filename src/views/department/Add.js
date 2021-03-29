@@ -96,7 +96,7 @@ export default class DepartAdd extends React.Component {
     DepartmentAdd(formObj)
       .then((res) => {
         message.success(res.data.message);
-        this.refs.form.resetFields();
+        // this.refs.form.resetFields();
       })
       .finally(() => {
         this.setState({
@@ -132,7 +132,12 @@ export default class DepartAdd extends React.Component {
     const { id } = this.state;
     DepartmentDetailed({ id }).then((res) => {
       const data = res.data.data;
-      this.refs.form.setFieldsValue(data);
+      this.setState({
+        formConfig:{
+          ...this.state.formConfig,
+          setFieldsValue:data
+        }
+      })
     });
   }
   render() {

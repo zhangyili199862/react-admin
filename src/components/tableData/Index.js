@@ -167,6 +167,7 @@ export default class TableComponent extends React.Component {
       rowKey,
       formItem,
     } = this.props.config;
+    console.log(thead)
     const { data, total } = this.state;
     const rowSelection = {
       onChange: this.onCheckBox,

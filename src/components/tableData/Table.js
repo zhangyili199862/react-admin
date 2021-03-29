@@ -1,20 +1,20 @@
 import React from "react";
-import { Table, Pagination, Row, Col, Button } from "antd";
+import { Table } from "antd";
 
-// import { connect } from "react-redux";
+import { connect } from "react-redux";
 import propTypes from "prop-types";
-import FormSearch from "../formSearch/Index";
+// import FormSearch from "../formSearch/Index";
 class TableBasics extends React.Component {
   render() {
-    const { thead } = this.props.config;
-
+    const {config,list} = this.props;
+    const { thead ,rowKey } = config;
     return (
       <React.Fragment>
         {/* dataSource={dataSource}
         rowSelection={rowSelection}
         rowKey={rowKey} */}
         <div style={{ marginBottom: "30px" }}></div>
-        <Table pagination={false} columns={thead} bordered />
+        <Table rowKey={rowKey} pagination={false} columns={thead} dataSource={list} bordered />
         {/* 
         <Row>
           <Col span={8} className="float-left">
@@ -38,27 +38,18 @@ class TableBasics extends React.Component {
   }
 }
 TableBasics.propTypes = {
-  columns: propTypes.array,
-  dataSource: propTypes.array,
-  total: propTypes.number,
-  changePageCurrent: propTypes.func,
-  changePageSize: propTypes.func,
-  batchButton: propTypes.bool,
-  rowSelection: propTypes.object,
-  rowKey: propTypes.string,
+  config:propTypes.object,
+  rowKey:propTypes.string
 };
 TableBasics.defaultProps = {
-  columns: [],
-  dataSource: [],
-  total: 0,
-  batchButton: true,
-  rowSelection: null,
-  rowKey: "id",
+  config:{},
+  rowKey:"id"
 };
-// const mapStateToProps = (state)=>{
-//   return {config:state.config}
-// }
-// const mapDispatchToProps = (state)=>{
-//   return {config:state.config}
-// }
-export default TableBasics;
+const mapStateToProps = (state)=>{
+  const {departmentList} = state.department;
+  return {list:departmentList}
+}
+const mapDispatchToProps = (state)=>{
+  
+}
+export default connect(mapStateToProps,mapDispatchToProps)(TableBasics);

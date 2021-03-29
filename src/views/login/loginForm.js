@@ -4,17 +4,21 @@ import "./index.scss";
 import { Form, Input, Button, Row, Col } from "antd";
 import { UserOutlined, UnlockOutlined } from "@ant-design/icons";
 import { validate_password } from "@/utils/validate";
-import {setToken,setUserName} from "@/utils/session";
-import CodeButton from "@/components/code/index"
+import CodeButton from "@/components/code/index";
 //接口
 import { Login } from "@/api/account";
 import { withRouter } from "react-router-dom";
+//redux
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+//action
+import {setTokenAction,setUsernameAction} from "@/store/action/app"
 class loginForm extends Component {
   constructor() {
     super();
     this.state = {
       userName: "",
-      loginLoading:false
+      loginLoading: false,
     };
     this.toggleClick = this.toggleClick.bind(this);
     this.onFinish = this.onFinish.bind(this);
@@ -22,20 +26,21 @@ class loginForm extends Component {
   //登录
   onFinish(values) {
     this.setState({
-      loginLoading:true
-    })
+      loginLoading: true,
+    });
     Login(values)
       .then((res) => {
         let data = res.data.data;
-        const {token,username} = data;
-        setToken(token);
-        setUserName(username);
-        this.props.history.push('/index');
+        const { token, username } = data;
+        //action
+        this.props.actions.setToken(token);
+        this.props.actions.setUsername(username);
+        this.props.history.push("/index");
       })
       .catch((e) => {
         this.setState({
-          loginLoading:false
-        })
+          loginLoading: false,
+        });
         console.log(e);
       });
   }
@@ -51,7 +56,7 @@ class loginForm extends Component {
     this.props.switchForm("register");
   }
   render() {
-    const {userName,loginLoading} = this.state;
+    const { userName, loginLoading } = this.state;
     return (
       <Fragment>
         <div className="form-header">
@@ -127,7 +132,7 @@ class loginForm extends Component {
                   />
                 </Col>
                 <Col span={10}>
-                  <CodeButton userName={userName}/>
+                  <CodeButton userName={userName} />
                 </Col>
               </Row>
             </Form.Item>
@@ -148,5 +153,9 @@ class loginForm extends Component {
     );
   }
 }
-
-export default withRouter(loginForm);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    actions:bindActionCreators({setToken:setTokenAction,setUsername:setUsernameAction},dispatch)
+  }
+};
+export default connect(null,mapDispatchToProps)(withRouter(loginForm));
