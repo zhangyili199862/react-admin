@@ -1,14 +1,11 @@
 import React from "react";
 
 import { message } from "antd";
-
 import FormCom from "@/components/form/Index";
 //API
 import {
-  DepartmentAdd,
-  DepartmentDetailed,
-  DepartmentEdit,
-} from "@/api/department";
+  Detailed
+} from "@/api/job";
 export default class DepartAdd extends React.Component {
   constructor(props) {
     super(props);
@@ -17,11 +14,12 @@ export default class DepartAdd extends React.Component {
       buttonDisabled: false,
       id: "",
       formConfig: {
-        url: "departmentAdd",
+        url: "jobAdd",
         initValue: {
           status: true,
           number: 0,
         },
+        formatKey: "parentId",
       },
       formLayout: {
         labelCol: { span: 2 },
@@ -30,30 +28,50 @@ export default class DepartAdd extends React.Component {
       formItem: [
         {
           label: "部门名称",
-          name: "name",
-          type: "Input",
+          name: "parentId",
+          type: "SelectComponent",
           rules: [
             {
               required: true,
               message: "部门名称不能为空",
             },
           ],
+          url: "getDepartmentList",
+          keyConfig: {
+            value: "id",
+            label: "name",
+          },
           style: {
             width: "150px",
           },
+          options: [
+            {
+              value: "4953",
+              label: "张毅力",
+            },
+            {
+              value: "4952",
+              label: "123",
+            },
+            {
+              value: "4949",
+              label: "划水部",
+            },
+          ],
         },
         {
-          label: "人员数量",
-          name: "number",
-          type: "InputNumber",
-          min: 0,
-          max: 100,
+          label: "职位名称",
+          name: "jobName",
+          type: "Input",
           rules: [
             {
               required: true,
-              message: "人员数量名称不能为空",
+              message: "职位名称不能为空",
             },
           ],
+          style: {
+            width: "150px",
+          },
         },
         {
           label: "禁启用",
@@ -84,38 +102,10 @@ export default class DepartAdd extends React.Component {
         },
       ],
     };
-    this.onSubmit = this.onSubmit.bind(this);
-  }
-  onSubmit(formObj) {
-    if (!formObj) return;
-    this.state.id === ""
-      ? this.handlerDepartAdd(formObj)
-      : this.handlerDepartEdit(formObj);
   }
   handlerDepartAdd(formObj) {
-    DepartmentAdd(formObj)
-      .then((res) => {
-        message.success(res.data.message);
-        // this.refs.form.resetFields();
-      })
-      .finally(() => {
-        this.setState({
-          buttonLoading: false,
-        });
-      });
   }
   handlerDepartEdit(formObj) {
-    const requestData = formObj;
-    requestData.id = this.state.id;
-    DepartmentEdit(requestData)
-      .then((res) => {
-        message.success(res.data.message);
-      })
-      .finally(() => {
-        this.setState({
-          buttonLoading: false,
-        });
-      });
   }
   componentWillMount() {
     if (this.props.location.state) {
@@ -130,7 +120,7 @@ export default class DepartAdd extends React.Component {
   getDetail() {
     if (!this.props.location.state) return;
     const { id } = this.state;
-    DepartmentDetailed({ id }).then((res) => {
+    Detailed({ id }).then((res) => {
       const data = res.data.data;
       this.setState({
         formConfig:{

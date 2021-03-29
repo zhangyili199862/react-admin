@@ -1,7 +1,7 @@
-import {configUploadStatus} from "../Type"
+import {configUpdateStatus,configAddStatus} from "../Type"
 export function addStatus(label,value){
     return {
-        type:"ADD_STATUS",
+        type:configAddStatus,
         payload:{
             label,value
         }
@@ -9,7 +9,7 @@ export function addStatus(label,value){
 }
 export function updateStatus(label,value){
     return {
-        type:configUploadStatus,
+        type:configUpdateStatus,
         payload:{
             label,value
         }

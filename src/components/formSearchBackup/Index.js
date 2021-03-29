@@ -1,11 +1,15 @@
 import React from "react";
-import { Form, Button, Input, Select, InputNumber, Radio, message } from "antd";
-import propTypes from "prop-types";
+import { Form, Button, Input, Select, InputNumber, Radio } from "antd";
 import { requestUrl } from "@/api/requestUrl";
-import { FormSubmit } from "@/api/common";
-import SelectCom from "@/components/select/index";
+import { TableList } from "@/api/common";
+import propTypes from "prop-types";
+import { connect } from "react-redux";
+import {bindActionCreators} from "redux"
+import Store from "@/store/Index";
+//action
+import {addDepartmentList,updateDepartmentList} from "@/store/action/department"
 const { Option } = Select;
-export default class FormCom extends React.Component {
+class FormSearch extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -14,20 +18,12 @@ export default class FormCom extends React.Component {
         wrapperCol: { span: 22 },
       },
     };
-    this.form = React.createRef();
     this.initFormItem = this.initFormItem.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.initInputNumber = this.initInputNumber.bind(this);
   }
-  componentWillReceiveProps({ formConfig }) {
-    this.refs.Form.setFieldsValue(formConfig.setFieldsValue)
-  }
   componentDidMount() {
-    // const {formConfig} = this.props;
-    // if(formConfig.setFieldValue){
-    //   this.refs.Form.setFieldsValue(formConfig.setFieldsValue)
-    // }
-    this.props.onRef && this.props.onRef(this);
+    this.onSubmit();
   }
   /**
    * Input
@@ -65,32 +61,7 @@ export default class FormCom extends React.Component {
       </Form.Item>
     );
   }
-  /**
-   * SelectComponent
-   */
-  initSelectComponent(item) {
-    return (
-      <Form.Item
-        label={item.label}
-        name={item.name}
-        key={item.name}
-        rules={[
-          ...item.rules,
-          {
-            validator: this.validatorSelect,
-          },
-        ]}
-      >
-        <SelectCom url={item.url} keyConfig={item.keyConfig} name={item.name} />
-      </Form.Item>
-    );
-  }
-  validatorSelect(rule, value) {
-    if (value || value[rule.field]) {
-      return Promise.resolve();
-    }
-    return Promise.reject(new Error("选项不能为空！"));
-  }
+
   /*
     InputNumber
   */
@@ -146,16 +117,18 @@ export default class FormCom extends React.Component {
     );
   }
   initFormItem() {
-    const { formItem } = this.props;
+    const { formItem, config } = this.props;
     if (!formItem || (formItem && formItem.length === 0)) {
       return false;
     }
     let formList = [];
+    console.log(this.props);
     formItem.map((item) => {
       if (item.type === "Input") {
         formList.push(this.initInput(item));
       }
       if (item.type === "Select") {
+        item.options = config[item.key];
         formList.push(this.initSelect(item));
       }
       if (item.type === "InputNumber") {
@@ -167,60 +140,95 @@ export default class FormCom extends React.Component {
       if (item.type === "TextArea") {
         formList.push(this.initTextArea(item));
       }
-      if (item.type === "SelectComponent") {
-        formList.push(this.initSelectComponent(item));
-      }
       return false;
     });
     return formList;
   }
-  onSubmit(value) {
-    this.setState({
-      buttonLoading: true,
-    });
-    const formatKey = this.props.formConfig.formatKey;
-    if (formatKey && value[formatKey]) {
-      const dataKey = value[formatKey];
-      delete value[formatKey];
-      value = Object.assign(value, dataKey);
-    }
-    const data = {
-      url: requestUrl[this.props.formConfig.url],
-      data: value,
+  search(params){
+    const requestData = {
+      url: requestUrl[params.url],
+      method: "post",
+      data: {
+        pageNumber: 1,
+        pageSize: 10,
+      },
     };
-    FormSubmit(data)
-      .then((res) => {
-        message.success(res.data.message);
-        this.refs.form.resetFields();
-      })
-      .finally(() => {
-        this.setState({
-          buttonLoading: false,
-        });
-      });
+    if (Object.keys(params.searchData).length !== 0) {
+      for (let key in params.searchData) {
+        requestData.data[key] = params.searchData[key];
+      }
+    }
+    TableList(requestData).then((res) => {
+      const resData = res.data.data;
+      this.props.actions.addData(resData);
+    });
+  }
+  onSubmit(value) {
+    console.log(this.props)
+    const searchData = {};
+    for (let key in value) {
+      if (value[key] !== undefined && value[key] !== "") {
+        searchData[key] = value[key];
+      }
+    }
+    this.search({
+      url: "department",
+      searchData,
+    });
+    // this.setState({
+    //   buttonLoading: true,
+    // });
+    // const data = {
+    //   url: requestUrl[this.props.formConfig.url],
+    //   data: value,
+    // };
+    // FormSubmit(data)
+    //   .then((res) => {
+    //     message.success(res.data.message);
+    //     this.refs.form.resetFields();
+    //   })
+    //   .finally(() => {
+    //     this.setState({
+    //       buttonLoading: false,
+    //     });
+    //   });
   }
   render() {
     const { formLayout, formConfig } = this.props;
     const { buttonLoading } = this.state;
     return (
       <Form
-        ref="Form"
+        layout="inline"
+        ref="form"
         {...formLayout}
+        initialValues={formConfig.initValue}
         onFinish={this.onSubmit}
       >
         {this.initFormItem()}
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={buttonLoading}>
-            确定
+            搜索
           </Button>
         </Form.Item>
       </Form>
     );
   }
 }
-FormCom.propTypes = {
+FormSearch.propTypes = {
   formConfig: propTypes.object,
 };
-FormCom.defaultProps = {
+FormSearch.defaultProps = {
   formConfig: {},
 };
+const mapStateToProps = (state) => {
+  return {
+    config: state.config,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    // listData: bindActionCreators(addDepartmentList,dispatch) //单个action
+    actions:bindActionCreators({addData:addDepartmentList,updateData:updateDepartmentList},dispatch)
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(FormSearch);

@@ -3,11 +3,7 @@ import React, { Fragment } from "react";
 import { Button, Switch } from "antd";
 import { Link } from "react-router-dom";
 //组件
-import TableComponent from "@/components/tableDataUse/Index";
-//Store
-import Store from "@/store/Index"
-
-import {addStatus,updateStatus} from "@/store/action/config"
+import TableComponent from "@/components/tableData/Index";
 export default class DepartList extends React.Component {
   constructor(props) {
     super(props);
@@ -26,14 +22,19 @@ export default class DepartList extends React.Component {
       //控制开关
       changgeId: "",
       tableConfig: {
-        url: "department",
+        url: "job",
         method: "post",
         rowKey: "id",
         checkBox: true,
         batchButton: false,
         thead: [
           {
-            title: "部门",
+            title: "职位名称",
+            dataIndex: "jobName",
+            key: "jobName",
+          },
+          {
+            title: "部门名称",
             dataIndex: "name",
             key: "name",
           },
@@ -85,26 +86,21 @@ export default class DepartList extends React.Component {
             type: "Input",
             label: "部门名称",
             name: "name",
+            rules: [
+              {
+                required: true,
+                message: "部门名称不能为空",
+              },
+            ],
             placeholder: "请输入部门名称",
           },
-          {
-            type:"Select",
-            label:"禁启用",
-            name:"status",
-            key:'status'
-          }
         ],
       },
     };
     this.getChildRef = this.getChildRef.bind(this);
     this.handleSwitch = this.handleSwitch.bind(this);
   }
-  componentDidMount(){
-    // Store.subscribe(()=>{
-    // })
-    // Store.dispatch(addStatus("所有","all"));
-    // Store.dispatch(updateStatus("不禁用",false))
-  }
+
   getChildRef(ref) {
     this.tableComponent = ref;
   }
@@ -120,10 +116,13 @@ export default class DepartList extends React.Component {
     this.setState({ changgeId: "" });
   }
   render() {
-    const { tableConfig,formItem } = this.state;
+    const { tableConfig } = this.state;
     return (
       <Fragment>
-        <TableComponent onRef={this.getChildRef} batchButton={true} config={this.state.tableConfig} />
+        <TableComponent
+          onRef={this.getChildRef}
+          config={tableConfig}
+        ></TableComponent>
       </Fragment>
     );
   }
