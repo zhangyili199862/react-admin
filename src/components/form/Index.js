@@ -24,7 +24,7 @@ export default class FormCom extends React.Component {
     this.initInputNumber = this.initInputNumber.bind(this);
   }
   componentWillReceiveProps({ formConfig }) {
-    this.refs.Form.setFieldsValue(formConfig.setFieldsValue);
+    this.refs.Form.setFieldsValue(formConfig.setFieldsValue)
   }
   componentDidMount() {
     // const {formConfig} = this.props;

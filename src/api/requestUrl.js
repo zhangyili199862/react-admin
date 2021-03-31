@@ -11,7 +11,6 @@ export const requestUrl = {
      * job
      */
     "job":"/job/list/",
-    "jobEdit":"/job/edit/",
     "jobDelete":"/job/delete/",
     "jobStatus":"/job/status/",
     "jobAdd":"/job/add/"
