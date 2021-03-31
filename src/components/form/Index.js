@@ -6,6 +6,7 @@ import propTypes from "prop-types";
 import { requestUrl } from "@/api/requestUrl";
 import { FormSubmit } from "@/api/common";
 import SelectCom from "@/components/select/index";
+import UploadCom from "@/components/upload/index"
 //scss
 import "./form.scss"
 const { Option } = Select;
@@ -191,6 +192,21 @@ export default class FormCom extends React.Component {
       </Form.Item>
     );
   }
+  /**
+   * 上传文件
+   */
+  initUpload(item){
+    return(
+      <Form.Item
+        label={item.label}
+        name={item.name}
+        key={item.name}
+        rules={item.rules ?? []}
+      >
+        <UploadCom name={item.name}/>
+      </Form.Item>
+    )
+  }
   initFormItem() {
     const { formItem } = this.props;
     if (!formItem || (formItem && formItem.length === 0)) {
@@ -224,6 +240,9 @@ export default class FormCom extends React.Component {
       }
       if(item.type === 'Date'){
         formList.push(this.initDate(item));
+      }
+      if(item.type === 'Upload'){
+        formList.push(this.initUpload(item))
       }
       return false;
     });

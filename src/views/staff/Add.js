@@ -1,13 +1,15 @@
 import React from "react";
-
-import { Select } from "antd";
+import "moment/locale/zh-cn";
+import locale from "antd/es/date-picker/locale/zh_CN";
+import { Col, Radio, Row, DatePicker } from "antd";
 import FormCom from "@/components/form/Index";
+import {validate_phone} from "@/utils/validate"
 //API
 import { Detailed } from "@/api/job";
 import { TableList } from "@/api/common";
 import { requestUrl } from "@/api/requestUrl";
+import { nation, face } from "@/js/data";
 // import SelectCom from "@/components/select/index";
-const { Option } = Select;
 export default class StaffAdd extends React.Component {
   constructor(props) {
     super(props);
@@ -44,7 +46,7 @@ export default class StaffAdd extends React.Component {
         },
         {
           label: "姓名",
-          name: "jobName",
+          name: "a1",
           type: "Input",
           rules: [
             {
@@ -52,13 +54,10 @@ export default class StaffAdd extends React.Component {
               message: "姓名不能为空",
             },
           ],
-          style: {
-            width: "150px",
-          },
         },
         {
           label: "性别",
-          name: "status",
+          name: "a2",
           type: "Radio",
           options: [
             { label: "男", value: 1 },
@@ -74,7 +73,7 @@ export default class StaffAdd extends React.Component {
         },
         {
           label: "身份证",
-          name: "jobName",
+          name: "a3",
           type: "Input",
           rules: [
             {
@@ -82,33 +81,42 @@ export default class StaffAdd extends React.Component {
               message: "身份证不能为空",
             },
           ],
-          style: {
-            width: "150px",
-          },
+        },
+        {
+          label: "头像",
+          name: "a13",
+          type: "Upload",
         },
         {
           type: "Date",
           label: "出生年月",
+          name: "a4",
           format: "YYYY/MM/DD",
           mode: "date",
         },
         {
           label: "手机号",
-          name: "jobName",
+          name: "a5",
           type: "Input",
           rules: [
             {
               required: true,
               message: "手机号不能为空",
             },
+            () => ({
+              validator(rule, value) {
+                if (validate_phone(value)) {
+                  return Promise.resolve();
+                } else {
+                  return Promise.reject("手机号格式有误");
+                }
+              },
+            }),
           ],
-          style: {
-            width: "150px",
-          },
         },
         {
           label: "身份证",
-          name: "jobName",
+          name: "a6",
           type: "Input",
           rules: [
             {
@@ -116,13 +124,10 @@ export default class StaffAdd extends React.Component {
               message: "身份证不能为空",
             },
           ],
-          style: {
-            width: "150px",
-          },
         },
         {
           label: "民族",
-          name: "jobName",
+          name: "a7",
           type: "Select",
           rules: [
             {
@@ -130,19 +135,12 @@ export default class StaffAdd extends React.Component {
               message: "民族不能为空",
             },
           ],
-          style: {
-            width: "150px",
-          },
-          options: [
-            {
-              label: "汉族",
-              value: "123",
-            },
-          ],
+
+          options: nation,
         },
         {
           label: "政治面貌",
-          name: "jobName",
+          name: "a8",
           type: "Select",
           rules: [
             {
@@ -150,19 +148,12 @@ export default class StaffAdd extends React.Component {
               message: "政治面貌不能为空",
             },
           ],
-          style: {
-            width: "150px",
-          },
-          options: [
-            {
-              label: "汉族",
-              value: "123",
-            },
-          ],
+
+          options: face,
         },
         {
           label: "描述",
-          name: "content",
+          name: "a9",
           type: "TextArea",
           rules: [
             {
@@ -174,6 +165,41 @@ export default class StaffAdd extends React.Component {
         {
           type: "Column",
           label: "职位信息",
+        },
+        {
+          label: "职位",
+          name: "a10",
+          type: "Select",
+          rules: [
+            {
+              required: true,
+              message: "职位不能为空",
+            },
+          ],
+
+          options: [
+            {
+              label: "汉族",
+              value: "123",
+            },
+          ],
+        },
+        {
+          type: "Slot",
+          label: "在职情况",
+          slotName: "jobSlot",
+          name: "a11",
+        },
+        {
+          label: "邮箱",
+          name: "a12",
+          type: "Input",
+          rules: [
+            {
+              required: true,
+              message: "邮箱不能为空",
+            },
+          ],
         },
       ],
     };
@@ -220,7 +246,7 @@ export default class StaffAdd extends React.Component {
     });
   }
   render() {
-    const { formItem, formLayout, formConfig, select } = this.state;
+    const { formItem, formLayout, formConfig } = this.state;
     return (
       <div>
         {/* <SelectCom  url={select.url}  keyConfig={select.keyConfig} name={select.name} /> */}
@@ -229,16 +255,29 @@ export default class StaffAdd extends React.Component {
           formLayout={formLayout}
           formConfig={formConfig}
         >
-          <Select ref="department">
-            {select &&
-              select.map((elem) => {
-                return (
-                  <Option value={elem.id} key={elem.id}>
-                    {elem.name}
-                  </Option>
-                );
-              })}
-          </Select>
+          <div ref="jobSlot">
+            <Row gutter={16}>
+              <Col className="gutter-row" span={4}>
+                <Radio>在职</Radio>
+                <DatePicker
+                  locale={locale}
+                  format="YYYY/MM/DD"
+                  picker="date"
+                ></DatePicker>
+              </Col>
+              <Col span={4}>
+                <Radio>休假</Radio>
+                <DatePicker
+                  locale={locale}
+                  format="YYYY/MM/DD"
+                  picker="date"
+                ></DatePicker>
+              </Col>
+              <Col span={4}>
+                <Radio>离职</Radio>
+              </Col>
+            </Row>
+          </div>
         </FormCom>
       </div>
     );

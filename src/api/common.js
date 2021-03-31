@@ -44,3 +44,14 @@ export function FormSubmit(params){
         data:params.data
     })
 }
+
+/**
+ * 七牛云token
+ */
+export function UploadToken(data){
+    return service.request({
+        url: "/uploadIToken/",
+        method: "post",
+        data
+    })
+}
