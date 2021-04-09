@@ -1,37 +1,40 @@
 import React from "react";
-import { Form, Button, Input, Select, InputNumber, Radio, message, DatePicker } from "antd";
-import 'moment/locale/zh-cn';
-import locale from 'antd/es/date-picker/locale/zh_CN';
+import {
+  Form,
+  Button,
+  Input,
+  Select,
+  InputNumber,
+  Radio,
+  message,
+  DatePicker,
+  Row,
+  Col,
+} from "antd";
+import "moment/locale/zh-cn";
+import locale from "antd/es/date-picker/locale/zh_CN";
 import propTypes from "prop-types";
 import { requestUrl } from "@/api/requestUrl";
 import { FormSubmit } from "@/api/common";
 import SelectCom from "@/components/select/index";
-import UploadCom from "@/components/upload/index"
+import UploadCom from "@/components/upload/index";
+import EditorCom from "@/components/editor/index";
 //scss
-import "./form.scss"
+import "./form.scss";
 const { Option } = Select;
 export default class FormCom extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      formLayout: {
-        labelCol: { span: 2 },
-        wrapperCol: { span: 22 },
-      },
-    };
+    this.state = {};
     this.form = React.createRef();
     this.initFormItem = this.initFormItem.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.initInputNumber = this.initInputNumber.bind(this);
   }
   componentWillReceiveProps({ formConfig }) {
-    this.refs.Form.setFieldsValue(formConfig.setFieldsValue)
+    this.refs.Form.setFieldsValue(formConfig.setFieldsValue);
   }
   componentDidMount() {
-    // const {formConfig} = this.props;
-    // if(formConfig.setFieldValue){
-    //   this.refs.Form.setFieldsValue(formConfig.setFieldsValue)
-    // }
     this.props.onRef && this.props.onRef(this);
   }
   /**
@@ -80,7 +83,7 @@ export default class FormCom extends React.Component {
         name={item.name}
         key={item.name}
         rules={[
-          ...item.rules,
+          ...(item.rules || []),
           {
             validator: this.validatorSelect,
           },
@@ -180,7 +183,7 @@ export default class FormCom extends React.Component {
   /**
    * Date
    */
-  initDate(item){
+  initDate(item) {
     return (
       <Form.Item
         label={item.label}
@@ -188,66 +191,123 @@ export default class FormCom extends React.Component {
         key={item.name}
         rules={item.rules ?? []}
       >
-        <DatePicker locale={locale} format={item.format} picker={item.mode}/>
+        <DatePicker locale={locale} format={item.format} picker={item.mode} />
       </Form.Item>
     );
   }
   /**
    * 上传文件
    */
-  initUpload(item){
-    return(
+  initUpload(item) {
+    return (
       <Form.Item
         label={item.label}
         name={item.name}
         key={item.name}
         rules={item.rules ?? []}
       >
-        <UploadCom name={item.name}/>
+        <UploadCom name={item.name} />
       </Form.Item>
-    )
+    );
+  }
+  /**
+   * 富文本编辑
+   */
+  initEditor(item) {
+    return (
+      <Form.Item
+        label={item.label}
+        name={item.name}
+        key={item.name}
+        rules={item.rules ?? []}
+      >
+        <EditorCom name={item.name} />
+      </Form.Item>
+    );
+  }
+  /**行内元素 */
+  initFormItemInLine(item) {
+    const { inlineItem } = item;
+
+    if (!inlineItem) return;
+    return (
+      <Row>
+        <Col
+          span={item.colLabel || 2}
+          className="ant-form-item"
+          style={{ textAlign: "right" }}
+        >
+          <div class="ant-form-item-label">
+            <label for="name" class=" ant-form-item-required" title="姓名">
+              {item.label}
+            </label>
+          </div>
+        </Col>
+        <Col span={item.colControl || 22}>
+          <Row>
+            {inlineItem.map((ele) => {
+              return (
+                <Col span={ele.col} className="form-item-inline-control">
+                  {this.createControl(ele)}
+                </Col>
+              );
+            })}
+          </Row>
+        </Col>
+      </Row>
+    );
   }
   initFormItem() {
     const { formItem } = this.props;
     if (!formItem || (formItem && formItem.length === 0)) {
       return false;
     }
-    let formList = [];
-    formItem.map((item) => {
-      if (item.type === "Input") {
-        formList.push(this.initInput(item));
-      }
-      if (item.type === "Select") {
-        formList.push(this.initSelect(item));
-      }
-      if (item.type === "InputNumber") {
-        formList.push(this.initInputNumber(item));
-      }
-      if (item.type === "Radio") {
-        formList.push(this.initRadio(item));
-      }
-      if (item.type === "TextArea") {
-        formList.push(this.initTextArea(item));
-      }
-      if (item.type === "SelectComponent") {
-        formList.push(this.initSelectComponent(item));
-      }
-      if (item.type === "Slot") {
-        formList.push(this.slotElem(item));
-      }
-      if (item.type === "Column") {
-        formList.push(this.initColumn(item));
-      }
-      if(item.type === 'Date'){
-        formList.push(this.initDate(item));
-      }
-      if(item.type === 'Upload'){
-        formList.push(this.initUpload(item))
-      }
-      return false;
+    let formList = formItem.map((item) => {
+      return this.createControl(item);
     });
     return formList;
   }
+  /**
+   * 创建表单控件
+   */
+  createControl = (item) => {
+    if (item.type === "Input") {
+      return this.initInput(item);
+    }
+    if (item.type === "Select") {
+      return this.initSelect(item);
+    }
+    if (item.type === "InputNumber") {
+      return this.initInputNumber(item);
+    }
+    if (item.type === "Radio") {
+      return this.initRadio(item);
+    }
+    if (item.type === "TextArea") {
+      return this.initTextArea(item);
+    }
+    if (item.type === "SelectComponent") {
+      return this.initSelectComponent(item);
+    }
+    if (item.type === "Slot") {
+      return this.slotElem(item);
+    }
+    if (item.type === "Column") {
+      return this.initColumn(item);
+    }
+    if (item.type === "Date") {
+      return this.initDate(item);
+    }
+    if (item.type === "Upload") {
+      return this.initUpload(item);
+    }
+    if (item.type === "Editor") {
+      return this.initEditor(item);
+    }
+    if (item.type === "formItemInLine") {
+      return this.initFormItemInLine(item);
+    }
+  };
   formatData(value) {
     let requestData = JSON.parse(JSON.stringify(value));
     const { formatKey, editKey, setFieldsValue } = this.props.formConfig;
@@ -286,23 +346,30 @@ export default class FormCom extends React.Component {
       });
   }
   render() {
-    const { formLayout } = this.props;
+    const { formLayout, submitButton } = this.props;
     const { buttonLoading } = this.state;
     return (
       <Form ref="Form" {...formLayout} onFinish={this.onSubmit}>
         {this.initFormItem()}
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={buttonLoading}>
-            确定
-          </Button>
-        </Form.Item>
+        <Row>
+          <Col span={formLayout.labelCol.span}></Col>
+          <Col span={formLayout.wrapperCol.span}>
+            {submitButton && (
+              <Button type="primary" htmlType="submit" loading={buttonLoading}>
+                确定
+              </Button>
+            )}
+          </Col>
+        </Row>
       </Form>
     );
   }
 }
 FormCom.propTypes = {
   formConfig: propTypes.object,
+  submitButton: propTypes.bool,
 };
 FormCom.defaultProps = {
   formConfig: {},
+  submitButton: true,
 };

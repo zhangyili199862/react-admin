@@ -1,87 +1,97 @@
-import React from "react";
-import { Select } from "antd";
-// import propTypes from "prop-types";
+import React, { Component } from "react";
+// propTypes
+import PropTypes from 'prop-types';
+// url
+import {requestUrl} from "@/api/requestUrl";
+// API
 import { TableList } from "@/api/common";
-import { requestUrl } from "@/api/requestUrl";
+// antd
+import { Select } from "antd";
 const { Option } = Select;
-export default class SelectCom extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      options: [
-        {
-          value: "4953",
-          label: "张毅力",
-        },
-        {
-          value: "4952",
-          label: "123",
-        },
-        {
-          value: "4949",
-          label: "划水部",
-        },
-      ],
-      value: "",
+
+class SelectComponent extends Component {
+    constructor(props){
+        super();
+        console.log(props)
+        this.state = {
+            props: props.propsKey,
+            options: [],
+            // change value
+            name: props.name,
+            value: ""
+        }
+    }  
+
+    componentDidMount(){
+        this.getSelectList();
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState){  // 1、静态的，无法获取 this.state，2、必须有返回
+        let { value, name } = nextProps;
+        if(!value) { return false; }
+        // 判断是否是JSON对象
+        if(Object.prototype.toString.call(value) === "[object Object]") {
+            value = value[name]   // { parentId: "760" }
+        }
+        if(value !== prevState.value) {
+            return {
+                value: value
+            }
+        }
+        // 直接放在最后面
+        return null;
+    }
+
+
+    // 请求数据
+    getSelectList = () => {
+        const url = this.props.url;
+        const data = {
+            url: requestUrl[url],
+            data: {}
+        }
+        // 不存在 url 时，阻止
+        if(!data.url) { return false; }
+        // 接口
+        TableList(data).then(response => {
+            this.setState({
+                options: response.data.data.data
+            })
+        })
+    }
+    // select onchang
+    onChange = (value) => {
+        this.setState({ value })
+        this.triggerChange(value);
+    }
+    triggerChange = (changedValue) => {
+        const onChange = this.props.onChange;
+        if (onChange) {
+          onChange(changedValue);
+        }
     };
-    this.getSelectList = this.getSelectList.bind(this);
-    this.valueChange = this.valueChange.bind(this);
-  }
-  triggerChange(changedValue) {
-    const onChange = this.props.onChange;
-    if (onChange) {
-      onChange({ [this.props.name]: changedValue });
+    
+
+    render(){
+        const { value, label } = this.props.keyConfig;
+        return (
+            <Select value={this.state.value} onChange={this.onChange}>
+                {
+                    this.state.options && this.state.options.map(elem => {
+                        return <Option value={elem[value]} key={Number(elem[value])}>{elem[label]}</Option>
+                    })
+                }
+            </Select>
+        )
     }
-  }
-  componentDidMount() {
-    this.getSelectList();
-  }
-  static getDerivedStateFromProps(nextProps, prevState) {
-    let { value,name } = nextProps;
-    if (!value) return;
-    if(Object.prototype.toString.call(value) === "[object Object]"){
-      value = value[name];
-    }
-    if (value !== prevState.value) {
-      return {
-        value: value,
-      };
-    }
-    return null;
-  }
-  getSelectList() {
-    const { url } = this.props;
-    const data = {
-      url: requestUrl[url],
-      data: null,
-    };
-    if (!data.url) return false;
-    TableList(data).then((res) => {
-      this.setState({
-        options: res.data.data.data,
-      });
-    });
-  }
-  valueChange(newValue) {
-    this.setState({
-      value: newValue,
-    });
-    this.triggerChange(newValue);
-  }
-  render() {
-    const { value, label } = this.props.keyConfig;
-    return (
-      <Select value={this.state.value} onChange={this.valueChange}>
-        {this.state.options &&
-          this.state.options.map((item) => {
-            return (
-              <Option value={item[value]} key={`${item[value]}_${item[label]}`}>
-                {item[label]}
-              </Option>
-            );
-          })}
-      </Select>
-    );
-  }
+
 }
-// SelectCom
+// 校验数据类型
+SelectComponent.propTypes = {
+    formConfig: PropTypes.object
+}
+// 默认
+SelectComponent.defaultProps = {
+    formConfig: {}
+}
+export default SelectComponent;

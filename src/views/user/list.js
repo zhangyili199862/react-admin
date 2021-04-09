@@ -4,11 +4,12 @@ import { Button, Switch } from "antd";
 import { Link } from "react-router-dom";
 //组件
 import TableComponent from "@/components/tableDataUse/Index";
+import UserModal from "./components/userModal";
 //Store
 // import Store from "@/store/Index"
 
 // import {addStatus,updateStatus} from "@/store/action/config"
-export default class StaffList extends React.Component {
+export default class UserList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -26,7 +27,7 @@ export default class StaffList extends React.Component {
       //控制开关
       changgeId: "",
       tableConfig: {
-        url: "staff",
+        url: "userList",
         method: "post",
         rowKey: "staff_id",
         checkBox: true,
@@ -79,7 +80,9 @@ export default class StaffList extends React.Component {
                       编辑
                     </Link>
                   </Button>
-                  <Button onClick={() => this.delete(rowData.staff_id)}>删除</Button>
+                  <Button onClick={() => this.delete(rowData.staff_id)}>
+                    删除
+                  </Button>
                 </div>
               );
             },
@@ -93,18 +96,20 @@ export default class StaffList extends React.Component {
             placeholder: "请输入部门名称",
           },
           {
-            type:"Select",
-            label:"禁启用",
-            name:"status",
-            key:'status'
-          }
+            type: "Select",
+            label: "禁启用",
+            name: "status",
+            key: "status",
+          },
         ],
+        formSearchFilter: 18,
+        formSearchRight: 6,
       },
     };
     this.getChildRef = this.getChildRef.bind(this);
     this.handleSwitch = this.handleSwitch.bind(this);
   }
-  componentDidMount(){
+  componentDidMount() {
     // Store.subscribe(()=>{
     // })
     // Store.dispatch(addStatus("所有","all"));
@@ -113,6 +118,12 @@ export default class StaffList extends React.Component {
   getChildRef(ref) {
     this.tableComponent = ref;
   }
+  getUserModalRef = (ref) => {
+    this.child = ref;
+  };
+  userModalShow = () => {
+    this.child.showModal(true);
+  };
   delete(id) {
     this.tableComponent.onHandleDelete(id);
   }
@@ -128,7 +139,16 @@ export default class StaffList extends React.Component {
     const { tableConfig } = this.state;
     return (
       <Fragment>
-        <TableComponent onRef={this.getChildRef} batchButton={true} config={tableConfig} />
+        <TableComponent
+          onRef={this.getChildRef}
+          batchButton={true}
+          config={tableConfig}
+        >
+          <Button type="primary" ref="userAdd" onClick={this.userModalShow}>
+            新增用户
+          </Button>
+        </TableComponent>
+        <UserModal onRef={this.getUserModalRef}></UserModal>
       </Fragment>
     );
   }

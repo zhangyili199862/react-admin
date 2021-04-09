@@ -13,5 +13,15 @@ export const requestUrl = {
     "job":"/job/list/",
     "jobDelete":"/job/delete/",
     "jobStatus":"/job/status/",
-    "jobAdd":"/job/add/"
+    "jobAdd":"/job/add/",
+    "jobListAll":"/job/listAll/",
+    "jobEdit":"/job/edit/",
+    //staff
+    "staff":"/staff/list/",
+    "staffAdd":"/staff/add/",
+    "staffDelete":"/staff/delete/",
+    "staffStatus":"/staff/status/",
+    "staffEdit":"/staff/edit/",
+    //user
+    "userList": "/user/list/"
 }

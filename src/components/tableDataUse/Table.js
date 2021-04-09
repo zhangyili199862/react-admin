@@ -17,6 +17,7 @@ export default class TableBasics extends React.Component {
     
     return (
       <React.Fragment>
+        <div style={{marginTop:'30px'}}></div>
         <Table
           pagination={false}
           columns={columns}

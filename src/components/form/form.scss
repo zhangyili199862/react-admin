@@ -1,7 +1,17 @@
-.form-column{
-    padding-top: 15px;
-    color:#344a5f;
-    border-top: 1px solid #e3e3e3;
-    font-size: 16px;
-    padding-bottom: 20px;
+.form-column {
+  padding-top: 15px;
+  color: #344a5f;
+  border-top: 1px solid #e3e3e3;
+  font-size: 16px;
+  padding-bottom: 20px;
+}
+.form-item-inline-control {
+    .ant-form-item {
+        display: block;
+    }
+    .ant-form-item-label {
+        max-width: 100%;
+        width: 100%;
+        text-align: left;
+    }
 }

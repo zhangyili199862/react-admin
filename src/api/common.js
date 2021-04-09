@@ -55,3 +55,13 @@ export function UploadToken(data){
         data
     })
 }
+/**
+ * 富文本图片上传
+ */
+export function Upload(data){
+    return service.request({
+        url: "/upload/",
+        method: "post",
+        data
+    })
+}

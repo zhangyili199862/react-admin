@@ -110,11 +110,13 @@ export default class TableComponent extends React.Component {
     });
   }
   onHandlerSwitch(data) {
+    console.log(data);
+    debugger
     const requestData = {
       url: requestUrl[`${this.props.config.url}Status`],
       data: {
         id: data.id,
-        status: data.status ? false : true,
+        status: data.status
       },
     };
     TableStatus(requestData).then((res) => {
@@ -167,7 +169,6 @@ export default class TableComponent extends React.Component {
       rowKey,
       formItem,
     } = this.props.config;
-    console.log(thead)
     const { data, total } = this.state;
     const rowSelection = {
       onChange: this.onCheckBox,

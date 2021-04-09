@@ -3,9 +3,9 @@ import React from "react";
 import propTypes from "prop-types";
 import { requestUrl } from "@/api/requestUrl";
 import { TableList, TableDelete, TableStatus } from "@/api/common";
-import FormSearch from "../formSearch/Index"
+import FormSearch from "../formSearch/Index";
 import TableBasics from "./Table";
-import { Modal, message } from "antd";
+import { Modal, message, Row, Col } from "antd";
 export default class TableComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -99,7 +99,12 @@ export default class TableComponent extends React.Component {
   }
   onHandleDelete(id) {
     if (!id) {
-      if (this.state.selectRowKeys.length === 0) return false;
+      if (
+        this.state.selectRowKeys &&
+        this.state.selectRowKeys.length &&
+        this.state.selectRowKeys.length === 0
+      )
+        return false;
 
       id = this.state.selectRowKeys.join();
     }
@@ -109,8 +114,7 @@ export default class TableComponent extends React.Component {
     });
   }
   onHandlerSwitch(data) {
-    console.log(this.props.config)
-    const {rowKey} = this.props.config;
+    const { rowKey } = this.props.config;
     const requestData = {
       url: requestUrl[`${this.props.config.url}Status`],
       data: {
@@ -167,6 +171,8 @@ export default class TableComponent extends React.Component {
       batchButton,
       rowKey,
       formItem,
+      formSearchFilter,
+      formSearchRight
     } = this.props.config;
     const { data, total } = this.state;
     const rowSelection = {
@@ -174,7 +180,16 @@ export default class TableComponent extends React.Component {
     };
     return (
       <React.Fragment>
-        <FormSearch formItem={formItem} search={this.search} />
+        <Row>
+          <Col span={formSearchFilter ||20}>
+            <FormSearch formItem={formItem} search={this.search} />
+          </Col>
+          <Col span={formSearchRight ||4}>
+            <div style={{float:"right"}}>
+              {this.props.children}
+            </div>
+          </Col>
+        </Row>
         {/* <Form layout="inline" onFinish={this.onFinish}>
           <Form.Item label="部门名称" name="name">
             <Input placeholder="请输入部门名称" />
