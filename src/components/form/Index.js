@@ -32,11 +32,16 @@ export default class FormCom extends React.Component {
     this.initInputNumber = this.initInputNumber.bind(this);
   }
   componentWillReceiveProps({ formConfig }) {
+    console.log(formConfig);
     this.refs.Form.setFieldsValue(formConfig.setFieldsValue);
   }
   componentDidMount() {
     this.props.onRef && this.props.onRef(this);
   }
+  /**Input 失去焦点 */
+  blurEvent = (e) => {
+    this.props.onBlur && this.props.onBlur(e);
+  };
   /**
    * Input
    */
@@ -47,8 +52,14 @@ export default class FormCom extends React.Component {
         name={item.name}
         key={item.name}
         rules={item.rules ?? []}
+        validateTrigger={item.trigger || ["onChange"]}
+        shouldUpdate={item.updateItem || false}
       >
-        <Input style={item.style} />
+        <Input
+          style={item.style}
+          type={item.valueType || "text"}
+          onBlur={item.blurEvent && this.blurEvent}
+        />
       </Form.Item>
     );
   }
@@ -326,6 +337,10 @@ export default class FormCom extends React.Component {
     // }
   }
   onSubmit(value) {
+    if (this.props.submit) {
+      this.props.submit(value);
+      return false;
+    }
     this.setState({
       buttonLoading: true,
     });

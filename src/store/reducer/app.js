@@ -2,6 +2,7 @@
 import {
   setToken as setTokenType,
   setUsername as setUsernameType,
+  logout,
 } from "../Type";
 import { getToken, getUserName } from "@/utils/session";
 const app = {
@@ -22,6 +23,14 @@ const configReducer = function (state = app, action) {
       return {
         ...state,
         username: action.payload,
+      };
+    }
+    //logout
+    case logout: {
+      return {
+        ...state,
+        token: action.value,
+        username: action.value,
       };
     }
     default:

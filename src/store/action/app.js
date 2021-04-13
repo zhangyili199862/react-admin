@@ -1,5 +1,5 @@
-import {setToken as setTokenType,setUsername as setUsernameType} from "../Type"
-import {setToken,setUserName} from "@/utils/session";
+import {setToken as setTokenType,setUsername as setUsernameType,logout} from "../Type"
+import {setToken,setUserName,removeToken,removeUsername} from "@/utils/session";
 export function setTokenAction(token){
     setToken(token)
     return {
@@ -12,5 +12,13 @@ export function setUsernameAction(username){
     return {
         type:setUsernameType,
         payload:username
+    }
+}
+export function logoutAction(){
+    removeToken();
+    removeUsername();
+    return {
+        type:logout,
+        value:""
     }
 }

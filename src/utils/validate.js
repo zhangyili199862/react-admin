@@ -4,3 +4,7 @@ const reg_phone = /^1[3456789]\d{9}$/;
 export function validate_phone(value){
     return reg_phone.test(value)
 }
+// 密码验证
+export function validate_pass(value){
+    return validate_password.test(value)
+}

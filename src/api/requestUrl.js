@@ -23,5 +23,7 @@ export const requestUrl = {
     "staffStatus":"/staff/status/",
     "staffEdit":"/staff/edit/",
     //user
-    "userList": "/user/list/"
+    "userList": "/user/list/",
+    "userAdd":"/user/add/",
+    "userEdit":"/user/edit/",
 }

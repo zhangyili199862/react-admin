@@ -34,19 +34,19 @@ export default class UserList extends React.Component {
         batchButton: false,
         thead: [
           {
-            title: "姓名",
-            dataIndex: "full_name",
-            key: "full_name",
+            title: "用户名",
+            dataIndex: "username",
+            key: "username",
           },
           {
-            title: "职位名称",
-            dataIndex: "jobName",
-            key: "jobName",
+            title: "真实姓名",
+            dataIndex: "truename",
+            key: "truename",
           },
           {
-            title: "部门名称",
-            dataIndex: "name",
-            key: "name",
+            title: "手机号",
+            dataIndex: "phone",
+            key: "phone",
           },
           {
             title: "禁启用",
@@ -63,6 +63,11 @@ export default class UserList extends React.Component {
             },
           },
           {
+            title: "权限",
+            dataIndex: "role_str",
+            key: "role_str",
+          },
+          {
             title: "操作",
             dataIndex: "operation",
             key: "operation",
@@ -70,15 +75,15 @@ export default class UserList extends React.Component {
             render: (text, rowData) => {
               return (
                 <div className="inline-button">
-                  <Button type="primary">
-                    <Link
+                  <Button type="primary" onClick={()=> this.onHandleEdit(rowData.id)}>
+                    {/* <Link
                       to={{
                         pathname: "/index/staff/add",
                         state: { id: rowData.staff_id },
                       }}
-                    >
+                    > */}
                       编辑
-                    </Link>
+                    {/* </Link> */}
                   </Button>
                   <Button onClick={() => this.delete(rowData.staff_id)}>
                     删除
@@ -118,11 +123,14 @@ export default class UserList extends React.Component {
   getChildRef(ref) {
     this.tableComponent = ref;
   }
+  onHandleEdit = (id) =>{
+    this.userModalShow({status:true,id})
+  }
   getUserModalRef = (ref) => {
     this.child = ref;
   };
-  userModalShow = () => {
-    this.child.showModal(true);
+  userModalShow = (data) => {
+    this.child.showModal(data);
   };
   delete(id) {
     this.tableComponent.onHandleDelete(id);
@@ -144,7 +152,7 @@ export default class UserList extends React.Component {
           batchButton={true}
           config={tableConfig}
         >
-          <Button type="primary" ref="userAdd" onClick={this.userModalShow}>
+          <Button type="primary" ref="userAdd" onClick={()=>this.userModalShow({status:true})}>
             新增用户
           </Button>
         </TableComponent>
